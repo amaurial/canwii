@@ -15,17 +15,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "at.h"
-#include "c_types.h"
-#include "user_interface.h"
-#include "at_version.h"
-#include "espconn.h"
-#include "mem.h"
 #include "at_ipCmd.h"
-#include "osapi.h"
-#include "driver/uart.h"
-#include <stdlib.h>
-#include "upgrade.h"
 
 extern at_mdStateType mdState;
 extern BOOL specialAtState;

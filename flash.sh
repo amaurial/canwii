@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 export PATH=$HOME/apps/esp/esptool/:$PATH
 
 export ESPSDK=$HOME/apps/esp/sdk

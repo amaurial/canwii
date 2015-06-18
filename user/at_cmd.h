@@ -23,6 +23,8 @@
 #include "at_ipCmd.h"
 #include "at_baseCmd.h"
 #include "at_merg.h"
+#include "user_interface.h"
+#include "osapi.h"
 
 #define at_cmdNum   27
 
@@ -31,9 +33,6 @@ at_funcationType at_fun[at_cmdNum]={
   {"+RST",  4,      CMD_RST,            at_testCmdGeneric,  NULL, NULL,           at_exeCmdRst},
   {"+GMR",  4,      CMD_GMR,            at_testCmdGeneric,  NULL, NULL,           at_exeCmdGmr},
   {"+GSLP", 5,      CMD_GSLP,           at_testCmdGeneric,  NULL, at_setupCmdGslp, NULL},
-#ifdef ali
-  {"+UPDATE", 7, CMD_CIUPDATE, NULL, NULL, NULL, at_exeCmdUpdate},
-#endif
   {"+CWMODE",   7,  CMD_CWMODE,         at_testCmdGeneric,  at_queryCmdCwmode,  at_setupCmdCwmode,      NULL},
   {"+CWJAP",    6,  CMD_CWJAP,          at_testCmdGeneric,  at_queryCmdCwjap,   at_setupCmdCwjap,       NULL},
   {"+CWLAP",    6,  CMD_CWLAP,          at_testCmdGeneric,  NULL,               at_setupCmdCwlap,       at_exeCmdCwlap},
@@ -57,9 +56,6 @@ at_funcationType at_fun[at_cmdNum]={
   {"+MERG"    , 5,  CMD_MERG_CONFIG_AP_EXT,at_testCmdGeneric,  NULL,               at_setupMerg,           NULL},
   {"+MERGAP"  , 7,  CMD_MERG_CONFIG_AP, at_testCmdGeneric,  NULL,               at_setupMerg,           NULL},
   {"+AT",       3,  CMD_AT,             at_testCmdGeneric,  at_exeCmdNull,      NULL,                   at_exeCmdNull}
-#ifdef ali
-  {"+MPINFO", 7, CMD_MPINFO,NULL, NULL, at_setupCmdMpinfo, NULL}
-#endif
 };
 
 #endif

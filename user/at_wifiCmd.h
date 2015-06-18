@@ -19,6 +19,11 @@
 #define __AT_WIFICMD_H
 
 #include "user_interface.h"
+#include "at_utils.h"
+#include "at.h"
+#include "osapi.h"
+#include "c_types.h"
+#include "mem.h"
 
 void at_testCmdCwmode(uint8_t id);
 void at_queryCmdCwmode(uint8_t id);

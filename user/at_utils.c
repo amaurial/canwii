@@ -169,6 +169,47 @@ at_dataStrCpyWithDelim(void *pDest, const void *pSrc, int8_t maxLen,char delim)
   return len;
 }
 
+/**
+  * @brief  Copy param from receive data to dest.
+  * @param  pDest: point to dest
+  * @param  pSrc: point to source
+  * @param  maxLen: copy max number of byte
+  * @retval the length of param
+  *   @arg -1: failure
+  */
+int8_t ICACHE_FLASH_ATTR
+at_dataStrCpy(void *pDest, const void *pSrc, int8_t maxLen)
+{
+
+  char *pTempD = pDest;
+  const char *pTempS = pSrc;
+  int8_t len;
+
+  if(*pTempS != '\"')
+  {
+    return -1;
+  }
+  pTempS++;
+  for(len=0; len<maxLen; len++)
+  {
+    if(*pTempS == '\"')
+    {
+      *pTempD = '\0';
+      break;
+    }
+    else
+    {
+      *pTempD++ = *pTempS++;
+    }
+  }
+  if(len == maxLen)
+  {
+    return -1;
+  }
+  return len;
+}
+
+
 //send general messages back
 void ICACHE_FLASH_ATTR
 sendGeneralMsg(struct_MSGType msgtype)

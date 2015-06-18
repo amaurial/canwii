@@ -15,13 +15,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "at.h"
 #include "at_wifiCmd.h"
-#include "osapi.h"
-#include "c_types.h"
-#include "mem.h"
-#include "at_utils.h"
 
 at_mdStateType mdState = m_unlink;
 
@@ -36,48 +30,6 @@ os_timer_t at_japDelayChack;
 /** @defgroup AT_WSIFICMD_Functions
   * @{
   */
-
-/**
-  * @brief  Copy param from receive data to dest.
-  * @param  pDest: point to dest
-  * @param  pSrc: point to source
-  * @param  maxLen: copy max number of byte
-  * @retval the length of param
-  *   @arg -1: failure
-  */
-int8_t ICACHE_FLASH_ATTR
-at_dataStrCpy(void *pDest, const void *pSrc, int8_t maxLen)
-{
-
-  char *pTempD = pDest;
-  const char *pTempS = pSrc;
-  int8_t len;
-
-  if(*pTempS != '\"')
-  {
-    return -1;
-  }
-  pTempS++;
-  for(len=0; len<maxLen; len++)
-  {
-    if(*pTempS == '\"')
-    {
-      *pTempD = '\0';
-      break;
-    }
-    else
-    {
-      *pTempD++ = *pTempS++;
-    }
-  }
-  if(len == maxLen)
-  {
-    return -1;
-  }
-  return len;
-}
-
-
 
 
 /**

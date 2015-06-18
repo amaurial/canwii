@@ -16,9 +16,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "at_cmd.h"
-#include "user_interface.h"
-#include "osapi.h"
-#include "at.h"
+
 //#include<stdlib.h>
 
 /** @defgroup AT_BASECMD_Functions

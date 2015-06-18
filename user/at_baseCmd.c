@@ -15,16 +15,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <stdlib.h>
-#include "osapi.h"
-#include "c_types.h"
-#include "at.h"
-#include "at_utils.h"
 #include "at_baseCmd.h"
-#include "user_interface.h"
-#include "at_version.h"
-#include "driver/uart_register.h"
-#include "spi_flash.h"
 
 /** @defgroup AT_BASECMD_Functions
   * @{
@@ -103,55 +94,6 @@ at_exeCmdGmr(uint8_t id)
   uart0_sendStr(temp);
   at_backOk;
 }
-
-
-#ifdef ali
-
-/**
-  * @brief  Through uart to update
-  * @param  id: commad id number
-  * @retval None
-  */
-void ICACHE_FLASH_ATTR
-at_exeCmdUpdate(uint8_t id)
-{
-  char temp[32];
-  updateFlagType upFlag;
-
-  os_sprintf(temp,"Is about to restart\n");
-  uart0_sendStr(temp);
-
-  spi_flash_read(60 * 4096, (uint32 *)&upFlag, sizeof(updateFlagType));
-
-  upFlag.flag = 1;
-  spi_flash_erase_sector(60);
-  spi_flash_write(60 * 4096, (uint32 *)&upFlag, sizeof(updateFlagType));
-  os_delay_us(10000);
-  system_reboot_from(0x00);
-}
-#endif
-
-#ifdef ali
-void ICACHE_FLASH_ATTR
-at_setupCmdMpinfo(uint8_t id, char *pPara)
-{
-  uint32 t;
-  char temp[32];
-
-  pPara++;
-  t = strtol(pPara,NULL,16);
-  os_sprintf(temp,"1st:%x\n",t);
-  uart0_sendStr(temp);
-
-  pPara = strchr(pPara, ',');
-
-  pPara++;
-  t = strtol(pPara,NULL,16);
-  os_sprintf(temp,"2nd:%x\n",t);
-  uart0_sendStr(temp);
-}
-#endif
-
 
 //#define ESP_PARAM_START_SEC   0x3C
 #define ESP_PARAM_START_SEC   0x3D

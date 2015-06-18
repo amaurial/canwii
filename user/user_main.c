@@ -24,6 +24,7 @@
 extern uint8_t at_wifiMode;
 extern void user_esp_platform_load_param(void *param, uint16 len);
 
+
 void user_init(void)
 {
   esp_StoreType tempUart;

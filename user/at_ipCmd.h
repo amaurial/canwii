@@ -18,6 +18,17 @@
 #ifndef __AT_IPCMD_H
 #define __AT_IPCMD_H
 
+#include "at.h"
+#include "c_types.h"
+#include "user_interface.h"
+#include "at_version.h"
+#include "espconn.h"
+#include "mem.h"
+#include "osapi.h"
+#include "driver/uart.h"
+#include <stdlib.h>
+#include "upgrade.h"
+
 #define at_linkMax 5
 
 typedef enum
