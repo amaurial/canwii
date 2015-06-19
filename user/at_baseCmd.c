@@ -282,34 +282,6 @@ user_esp_platform_save_param(void *param, uint16 len)
     }
 }
 
-
-void ICACHE_FLASH_ATTR
-at_setupCmdIpr(uint8_t id, char *pPara)
-{
-  esp_StoreType tempUart;
-
-  pPara++;
-  tempUart.baud = atoi(pPara);
-  if((tempUart.baud>(UART_CLK_FREQ / 16))||(tempUart.baud == 0))
-  {
-    at_backError;
-    return;
-  }
-  while(TRUE)
-  {
-    uint32_t fifo_cnt = READ_PERI_REG(UART_STATUS(0)) & (UART_TXFIFO_CNT<<UART_TXFIFO_CNT_S);
-    if((fifo_cnt >> UART_TXFIFO_CNT_S & UART_TXFIFO_CNT) == 0)
-    {
-      break;
-    }
-  }
-  os_delay_us(10000);
-  uart_div_modify(0, UART_CLK_FREQ / tempUart.baud);
-  tempUart.saved = 1;
-  user_esp_platform_save_param((uint32 *)&tempUart, sizeof(esp_StoreType));
-  at_backOk;
-}
-
 void ICACHE_FLASH_ATTR
 at_setupCmdGslp(uint8_t id, char *pPara)
 {

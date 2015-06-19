@@ -2229,31 +2229,7 @@ upServer_dns_found(const char *name, ip_addr_t *ipaddr, void *arg)
   }
 }
 
-void ICACHE_FLASH_ATTR
-at_exeCmdCiupdate(uint8_t id)
-{
-  pespconn = (struct espconn *)os_zalloc(sizeof(struct espconn));
-  pespconn->type = ESPCONN_TCP;
-  pespconn->state = ESPCONN_NONE;
-  pespconn->proto.tcp = (esp_tcp *)os_zalloc(sizeof(esp_tcp));
-  pespconn->proto.tcp->local_port = espconn_port();
-  pespconn->proto.tcp->remote_port = 80;
 
-  specialAtState = FALSE;
-  espconn_gethostbyname(pespconn, "iot.espressif.cn", &host_ip, upServer_dns_found);
-}
-
-void ICACHE_FLASH_ATTR
-at_exeCmdCiping(uint8_t id)
-{
-	at_backOk;
-}
-
-void ICACHE_FLASH_ATTR
-at_exeCmdCipappup(uint8_t id)
-{
-
-}
 
 
 

@@ -3,5 +3,5 @@
 make clean
 make
 ./prepare_flash.sh
-./flash.sh /dev/ttyUSB0 both 
+./flash.sh /dev/ttyUSB0 both
 

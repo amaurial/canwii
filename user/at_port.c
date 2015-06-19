@@ -91,10 +91,10 @@ at_recvTask(os_event_t *events)
       //read the byte from queue
       temp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
       //do the echo function
-      if(echoFlag)
-      {
+      //if(echoFlag)
+      //{
         uart_tx_one_char(temp);
-      }
+      //}
     }
 
 

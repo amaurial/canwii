@@ -244,5 +244,5 @@ void ICACHE_FLASH_ATTR
 uart_reattach()
 {
 	//uart_init(BIT_RATE_74880, BIT_RATE_74880);
-	uart_init(BIT_RATE_115200, BIT_RATE_9600);
+	uart_init(BIT_RATE_115200, BIT_RATE_115200);
 }

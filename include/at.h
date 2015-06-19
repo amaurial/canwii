@@ -25,8 +25,8 @@
 #define at_recvTaskQueueLen    64
 
 #define CMD_BUFFER_SIZE 128
-//#define DEBUG
-//#define VERBOSE
+//#define DEBUG 1
+//#define VERBOSE 1
 
 
 #define at_procTaskPrio        1
@@ -36,8 +36,8 @@
     #define at_backError     uart0_sendStr("\nERROR\n")
     #define at_backTeError   "+CTE ERROR: %d\n"
 #else
-    #define at_backOk        uart_tx_one_char(CANWII_OK)
-    #define at_backError     uart_tx_one_char(CANWII_ERR)
+    #define at_backOk        {uart_tx_one_char(CANWII_OK);}//;uart0_sendStr("\n");}
+    #define at_backError     {uart_tx_one_char(CANWII_ERR);}//;uart0_sendStr("\n");}
     #define at_backTeError   "%d" + CANWII_TE_ERR
 #endif // VERBOSE
 
@@ -45,7 +45,6 @@
 #define CMD_RST 0x0b
 #define CMD_GMR 0x0c
 #define CMD_GSLP 0x0d
-#define CMD_IPR 0x0e
 #define CMD_CWMODE 0x0f
 #define CMD_CWJAP 0x10
 #define CMD_CWLAP 0x11
@@ -67,9 +66,6 @@
 #define CMD_CIPMODE 0x21
 #define CMD_CIPSTO 0x22
 #define CMD_CIUPDATE 0x23
-#define CMD_CIPING 0x24
-#define CMD_CIPAPPUP 0x25
-#define CMD_ATE 0x26
 #define CMD_MPINFO 0x27
 #define CMD_IPD 0x28
 #define CMD_MERG_CONFIG_AP_EXT 0x29

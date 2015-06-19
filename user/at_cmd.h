@@ -24,15 +24,13 @@
 #include "at_baseCmd.h"
 #include "at_merg.h"
 
-#define at_cmdNum   34
+#define at_cmdNum   27
 
 at_funcationType at_fun[at_cmdNum]={
   {NULL,    0,      0x00,               NULL,               NULL, NULL,           at_exeCmdNull},
-  {"E",     1,      CMD_ATE,            NULL,               NULL, at_setupCmdE,   NULL},
   {"+RST",  4,      CMD_RST,            at_testCmdGeneric,  NULL, NULL,           at_exeCmdRst},
   {"+GMR",  4,      CMD_GMR,            at_testCmdGeneric,  NULL, NULL,           at_exeCmdGmr},
   {"+GSLP", 5,      CMD_GSLP,           at_testCmdGeneric,  NULL, at_setupCmdGslp, NULL},
-  {"+IPR",  4,      CMD_IPR,            at_testCmdGeneric,  NULL, at_setupCmdIpr, NULL},
 #ifdef ali
   {"+UPDATE", 7, CMD_CIUPDATE, NULL, NULL, NULL, at_exeCmdUpdate},
 #endif
@@ -56,9 +54,6 @@ at_funcationType at_fun[at_cmdNum]={
   {"+CIPSERVER",10, CMD_CIPSERVER,      at_testCmdGeneric,  NULL,               at_setupCmdCipserver,   NULL},
   {"+CIPMODE",  8,  CMD_CIPMODE,        at_testCmdGeneric,  at_queryCmdCipmode, at_setupCmdCipmode,     NULL},
   {"+CIPSTO",   7,  CMD_CIPSTO,         at_testCmdGeneric,  at_queryCmdCipsto,  at_setupCmdCipsto,      NULL},
-  {"+CIUPDATE", 9,  CMD_CIUPDATE,       at_testCmdGeneric,  NULL,               NULL,                   at_exeCmdCiupdate},
-  {"+CIPING",   7,  CMD_CIPING,         at_testCmdGeneric,  NULL,               NULL,                   at_exeCmdCiping},
-  {"+CIPAPPUP", 9,  CMD_CIPAPPUP,       at_testCmdGeneric,  NULL,               NULL,                   at_exeCmdCipappup},
   {"+MERG"    , 5,  CMD_MERG_CONFIG_AP_EXT,at_testCmdGeneric,  NULL,               at_setupMerg,           NULL},
   {"+MERGAP"  , 7,  CMD_MERG_CONFIG_AP, at_testCmdGeneric,  NULL,               at_setupMerg,           NULL},
   {"+AT",       3,  CMD_AT,             at_testCmdGeneric,  at_exeCmdNull,      NULL,                   at_exeCmdNull}

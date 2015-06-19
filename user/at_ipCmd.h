@@ -73,12 +73,6 @@ uint8_t at_setupCmdCipmodeEsp(uint8_t mode);
 void at_queryCmdCipsto(uint8_t id);
 void at_setupCmdCipsto(uint8_t id, char *pPara);
 
-void at_exeCmdCiupdate(uint8_t id);
-
-void at_exeCmdCiping(uint8_t id);
-
-void at_exeCmdCipappup(uint8_t id);
-
 void at_sendData(char *pdata, unsigned short len,uint8_t linkId);
 
 #endif

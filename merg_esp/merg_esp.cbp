@@ -5,6 +5,7 @@
 		<Option title="merg_esp" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
+		<Option virtualFolders="user/;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/merg_esp" prefix_auto="1" extension_auto="1" />
@@ -36,7 +37,9 @@
 		</Unit>
 		<Unit filename="../include/at.h" />
 		<Unit filename="../include/at_version.h" />
-		<Unit filename="../include/canwii.h" />
+		<Unit filename="../include/canwii.h">
+			<Option virtualFolder="user/" />
+		</Unit>
 		<Unit filename="../include/driver/uart.h" />
 		<Unit filename="../include/driver/uart_register.h" />
 		<Unit filename="../include/user_config.h" />
