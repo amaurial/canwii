@@ -55,7 +55,7 @@ os_event_t    at_procTaskQueue[at_procTaskQueueLen];
 BOOL specialAtState = TRUE;
 at_stateType  at_state;
 uint8_t *pDataLine;
-BOOL echoFlag = TRUE;
+BOOL echoFlag = FALSE;
 
 static uint8_t at_cmdLine[CMD_BUFFER_SIZE];
 uint8_t at_dataLine[at_dataLenMax];
@@ -93,7 +93,7 @@ at_recvTask(os_event_t *events)
       //do the echo function
       //if(echoFlag)
       //{
-        uart_tx_one_char(temp);
+      //  uart_tx_one_char(temp);
       //}
     }
 
@@ -163,8 +163,12 @@ at_recvTask(os_event_t *events)
     case at_statProcess: //process data
       if(temp == CANWII_EOH)
       {
-        uart0_sendStr("\nbusy p...\n");
-        //uart_tx_one_char(CANWII_ERR_BUSY);
+        #ifdef VERBOSE
+            uart0_sendStr("\nbusy p...\n");
+
+        #else
+            uart_tx_one_char(CANWII_ERR_BUSY);
+        #endif // VERBOSE
 
       }
       break;
@@ -186,8 +190,12 @@ at_recvTask(os_event_t *events)
     case at_statIpSended: //send data
       if(temp == CANWII_EOH)
       {
-        uart0_sendStr("busy s...\n");
-        //uart_tx_one_char(CANWII_ERR_BUSY);
+        #ifdef VERBOSE
+            uart0_sendStr("\nbusy p...\n");
+
+        #else
+            uart_tx_one_char(CANWII_ERR_BUSY);
+        #endif // VERBOSE
       }
       break;
     //TODO:
