@@ -44,9 +44,14 @@ CMD_CIPING = "\x24"
 CMD_CIPAPPUP = "\x25"
 CMD_ATE = "\x26"
 CMD_MPINFO = "\x27"
+CMD_MERG = "\x29"
+CMD_MERG_AP= "\x30"
 
 CANWII_SOH = "\x01"
 CANWII_EOH = "\x04"
+CANWII_OK = "\x02"
+CANWII_ERR = "\x03"
+
 CANWII_TEST = "=?"
 
 CMDS=dict(AT=CMD_AT,RST=CMD_RST,GMR=CMD_GMR,GSLP=CMD_GSLP,IPR=CMD_IPR,CWMODE=CMD_CWMODE,CWJAP=CMD_CWJAP,
@@ -54,7 +59,7 @@ CMDS=dict(AT=CMD_AT,RST=CMD_RST,GMR=CMD_GMR,GSLP=CMD_GSLP,IPR=CMD_IPR,CWMODE=CMD
         CIFSR=CMD_CIFSR,CIPSTAMAC=CMD_CIPSTAMAC,CIPAPMAC=CMD_CIPAPMAC,CIPSTA=CMD_CIPSTA,CIPAP=CMD_CIPAP,
         CIPSTATUS=CMD_CIPSTATUS,CIPSTART=CMD_CIPSTART,CIPCLOSE=CMD_CIPCLOSE,CIPSEND=CMD_CIPSEND,
         CIPMUX=CMD_CIPMUX,CIPSERVER=CMD_CIPSERVER,CIPMODE=CMD_CIPMODE,CIPSTO=CMD_CIPSTO,CIPUPDATE=CMD_CIUPDATE,
-        CIPING=CMD_CIPING,CIPAPPUP=CMD_CIPAPPUP,ATE=CMD_ATE,MPINFO=CMD_MPINFO)
+        CIPING=CMD_CIPING,CIPAPPUP=CMD_CIPAPPUP,ATE=CMD_ATE,MPINFO=CMD_MPINFO,MERG=CMD_MERG,MERG_AP=CMD_MERG_AP)
 
 def sendCommand(command,timewait=0):
 
@@ -62,23 +67,34 @@ def sendCommand(command,timewait=0):
         try:
             #write data
             print("write data:" , command, end='\n')
+            print("write data binary:" , command.encode(), end='\n')
             ser.write(command.encode())
+            #ser.flush()
             time.sleep(timewait)  #give the serial port sometime to receive the data
             numOfLines = 0
-            response = ser.readline()
+            #print("read1");
+            response=ser.read(255)
+
+            #response = ser.readline()
             cmdResponse = response
             while True:
-                response = ser.readline()
-                cmdResponse = cmdResponse + response
-                print("read data: " , response,end='\n')
                 numOfLines = numOfLines + 1
                 if len(cmdResponse)>0:
+                    #print("read2");
                     if checkReceived(cmdResponse.decode())>=0:
+                        #print("read3");
                         return cmdResponse.decode()
                         break
                 if ((numOfLines >= 30) and (len(response) == 0)):
                     return cmdResponse.decode()
                     break
+                #response = ser.readline()
+                #print("read4");
+                response=ser.read(255)
+                cmdResponse = cmdResponse + response
+                print("read data: " , cmdResponse.decode(),end='\n')
+                print("read data binary: " , cmdResponse,end='\n')
+
 
         except Exception as e1:
             print('error communicating...: ',e1,end='\n')
@@ -87,10 +103,30 @@ def sendCommand(command,timewait=0):
 
         print("cannot open serial port ")
 
+def resetEsp():
+    if ser.isOpen():
+        try:
+            #write data
+            print("write data:" , "RESET", end='\n')
+            command=CANWII_SOH + CMD_RST + CANWII_EOH
+            ser.write(command.encode())
+            time.sleep(5)  #give the serial port sometime to receive the data
+
+
+        except Exception as e1:
+            print('error communicating...: ',e1,end='\n')
+            ser.close()
+    else:
+
+        print("cannot send reset ")
+
 def checkReceived(data):
     #check the end of string sent by the esp
     #we are looking for OK\n
+
+    temp=" "
     temp=data
+
     #print ("data:",len(temp),end='\n')
     if len(temp)<1:
         return -1
@@ -98,12 +134,26 @@ def checkReceived(data):
     if (temp.find("OK\n")>=0):
         #print("Found OK\n")
         return 0
+
+    if (temp.find("NO_CHANGE\n")>=0):
+        #print("Found OK\n")
+        return 0
     if (temp.find("ERROR\n")>=0):
         #print("Found OK\n")
         return 1
+
     if (temp.find("\n>")>=0):
         #print("Found OK\n")
         return 2
+    if (temp.find("FAIL\n")>=0):
+        #print("Found OK\n")
+        return 3
+    if (temp.find((CANWII_OK))>=0):
+        #print("Found OK\n")
+        return 0
+    if (temp.find((CANWII_ERR))>=0):
+        #print("Found OK\n")
+        return 1
     #print("Not found OK\n")
     return -1
 
@@ -137,6 +187,192 @@ def setupWifiClient():
         print("Wifi connected Success")
     return True
 
+def setupWifiServer():
+    #set mode
+    resp=sendCommand(CANWII_SOH + CMD_CWMODE + "=" + "3" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set the mode\n")
+        return False
+
+    #set multiple connections
+    # resp=sendCommand(CANWII_SOH + CMD_RST + CANWII_EOH)
+    # if checkReceived(resp)!=0:
+    #     print ("Failed to set multiple connections\n")
+    #     return False
+    # ser.close()
+    # time.sleep(5)
+    # ser.open()
+
+    #set multiple connections
+    resp=sendCommand(CANWII_SOH + CMD_CIPMUX + "=1" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set multiple connections\n")
+        return False
+
+    #connect to ap
+    resp=sendCommand(CANWII_SOH + CMD_CWJAP + "=" + "\"dlink\",\"\"" + CANWII_EOH,10)
+    if checkReceived(resp)!=0:
+        print ("Failed to connect\n")
+        return False
+
+    #check connection to ap
+    resp=sendCommand(CANWII_SOH + CMD_CWJAP + "?" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to connect\n")
+        return False
+
+    #check IP
+    resp=sendCommand(CANWII_SOH + CMD_CIFSR + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to get ip\n")
+        sendCommand(CANWII_SOH + CMD_CWQAP + CANWII_EOH)
+        return False
+
+    if resp.find("STAIP")>0:
+        print("Wifi connected to client")
+
+#set Reset
+    resp=sendCommand(CANWII_SOH + CMD_CIPSTATUS + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed get status\n")
+        return False
+
+
+    #set the esp in server mode
+    resp=sendCommand(CANWII_SOH + CMD_CIPSERVER + "=1,30" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set server mode\n")
+        sendCommand(CANWII_SOH + CMD_CWQAP + CANWII_EOH)
+        return False
+
+
+     #set timeout
+    resp=sendCommand(CANWII_SOH + CMD_CIPSTO + "=30" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set timeout\n")
+        sendCommand(CANWII_SOH + CMD_CWQAP + CANWII_EOH)
+        return False
+
+
+    return True
+
+def setupApServer():
+
+    #set multiple connections
+    print ("Setting multiple connections\n")
+    resp=sendCommand(CANWII_SOH + CMD_CIPMUX + "=1" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set multiple connections\n")
+        return False
+
+    #check IP
+    print ("Getting the IP\n")
+    resp=sendCommand(CANWII_SOH + CMD_CIFSR + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to get ip\n")
+        sendCommand(CANWII_SOH + CMD_CWQAP + CANWII_EOH)
+        return False
+
+    if resp.find("STAIP")>0:
+        print("Wifi connected to client")
+
+    print ("Printing STATUS\n")
+    resp=sendCommand(CANWII_SOH + CMD_CIPSTATUS + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed get status\n")
+        return False
+
+
+    #set the esp in server mode
+    print ("Putting SERVER MODE\n")
+    resp=sendCommand(CANWII_SOH + CMD_CIPSERVER + "=1,30" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set server mode\n")
+        sendCommand(CANWII_SOH + CMD_CWQAP + CANWII_EOH)
+        return False
+
+
+     #set timeout
+    print ("Setting the timeout\n")
+    resp=sendCommand(CANWII_SOH + CMD_CIPSTO + "=60" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set timeout\n")
+        sendCommand(CANWII_SOH + CMD_CWQAP + CANWII_EOH)
+        return False
+
+
+    return True
+
+def setupApWifiServer():
+    #set mode
+    resp=sendCommand(CANWII_SOH + CMD_CWMODE + "=" + "3" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set the mode\n")
+        return False
+
+    # #set multiple connections
+    # resp=sendCommand(CANWII_SOH + CMD_CIPMUX + "=1" + CANWII_EOH)
+    # if checkReceived(resp)!=0:
+    #     print ("Failed to set multiple connections\n")
+    #     return False
+
+    #check connection to ap
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "=2,0" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set dhcp\n")
+        return False
+
+    #connect to ap
+    resp=sendCommand(CANWII_SOH + CMD_CWSAP + "=" + "\"esp\",\"123\",1,0" + CANWII_EOH,10)
+    if checkReceived(resp)!=0:
+        print ("Failed to set ap\n")
+        return False
+
+    return True
+
+#*<SOH>
+        #     <CMD_MERG><=>
+        #         <MERG_CMDID>
+        #         <CWMODE>
+        #         <CWDHCP_P1>
+        #         <CWDHCP_P2>
+        #         <ssid>,<passwd>,
+        #         <CWSAP_p3> channel
+        #         <CWSAP_p4> wpa type
+        #         <CIPMUX>
+        #         <CIPSERVER_p1>
+        #         <CIPSERVER_p2>
+        # <EOH>
+
+def setupMergServer():
+     #         <MERG_CMDID>30
+        #         <CWMODE>3
+        #         <CWDHCP_P1>2
+        #         <CWDHCP_P2>0
+        #         <ssid>,<passwd>,esp,123
+        #         <CWSAP_p3> channel 1
+        #         <CWSAP_p4> wpa type 0
+        #         <CIPMUX> 1
+        #         <CIPSERVER_p1> 1
+        #         <CIPSERVER_p2> 30
+
+    #resp=sendCommand(CANWII_SOH + CMD_MERG + "=" + "320esp,123,1011" + "\x30" + CANWII_EOH,2)
+
+#    /*<SOH>
+#            <CMD_MERG_CONFIG_APT><=>
+#                <ssid>,<passwd>,
+#                <CWSAP_p3> channel
+#                <CWSAP_p4> wpa type
+#                <PORT>
+#        <EOH>
+#        */
+    resp=sendCommand(CANWII_SOH + CMD_MERG_AP + "=" + "esp,123,100" + "\x30" + CANWII_EOH,2)
+
+    if checkReceived(resp)!=0:
+        print ("Failed to set merg mode\n")
+        return False
+    return True
+
 def connectToServer(host,port):
     #open connection
     try:
@@ -161,8 +397,6 @@ def sendSomeData():
     data="hello\n"
     resp=sendCommand(CANWII_SOH + CMD_CIPSEND + "=1," + str(len(data)) + CANWII_EOH)
     print(resp,end='\n')
-#    if checkReceived(resp)!=2:
-#        print ("Failed to send data\n")
 
     for i in range(1,10):
         resp=sendCommand(data,0.8)
@@ -171,6 +405,29 @@ def sendSomeData():
             print ("Failed to send data ",i,end='\n')
 
     sendCommand("quit")
+
+def readServerData():
+    if ser.isOpen():
+        try:
+            while True:
+                response = ser.readline()
+                if len(response)>0:
+                    print(response,end='\n')
+                    if (response.decode().find("quit")>=0):
+                        return True
+        except Exception as e:
+                print("error open serial port: " + e)
+                return False
+        return False
+
+def reopenSerial():
+    for i in range (1,10):
+        try:
+            ser.open()
+            return
+        except Exception as e:
+            print("error open serial port: " + e)
+    exit()
 
 
 ser = serial.Serial()
@@ -187,20 +444,16 @@ ser.xonxoff = False  #disable software flow control
 ser.rtscts = False  #disable hardware (RTS/CTS) flow control
 ser.dsrdtr = False  #disable hardware (DSR/DTR) flow control
 ser.writeTimeout = 2  #timeout for write
-
-try:
-    ser.open()
-except Exception as e:
-    print("error open serial port: " + e)
-    exit()
+reopenSerial()
 
 if ser.isOpen():
     try:
         #for k,v in CMDS.items():
         #    print("Testing ",k,end='\n')
-            #sendCommand(CANWII_SOH + v + CANWII_TEST+ CANWII_EOH)
-
+        #    sendCommand(CANWII_SOH + v + CANWII_TEST+ CANWII_EOH)
+        print ("Sending AT")
         resp=sendCommand(CANWII_SOH + CMD_AT + CANWII_EOH)
+        print ("AT received")
         if checkReceived(resp)!=0:
             print ("No OK found\n")
 
@@ -208,12 +461,45 @@ if ser.isOpen():
         if checkReceived(resp)!=0:
             print ("No OK found\n")
 
-        if setupWifiClient():
-            #sendCommand("quit")
-            if connectToServer("192.168.1.119","9999"):
-                sendSomeData()
+        #if setupWifiClient():
+        #     #sendCommand("quit")
+        #     if connectToServer("192.168.1.119","9999"):
+        #         sendSomeData()
 
-        sendCommand(CANWII_SOH + CMD_CWQAP + CANWII_EOH)
+        #if setupWifiServer():
+        #   readServerData()
+        #if setupApServer():
+        if setupMergServer():
+            #ser.close()
+            #time.sleep(5);
+            #reopenSerial()
+            print ("Set AP OK\n")
+
+            if readServerData()==False:
+                sendCommand(CANWII_SOH + CMD_CIPCLOSE + "=5" + CANWII_EOH)
+                exit()
+
+
+        #print("Putting ESP in AP mode\n")
+        #if setupApWifiServer():
+            # print("Reseting\n")
+            # resetEsp()
+            # print("Closing serial comm and slepping\n")
+            # ser.close()
+            # time.sleep(10)
+            # print("Try to open serial comm\n")
+            # ser.open()
+            # print("Try to open serial comm\n")
+            # if (ser.isOpen()):
+            #     print("Waiting for connections\n")
+            # else:
+            #     print("Failed to reopen serial comm\n")
+
+         #   if setupApServer():
+         #      readServerData()
+
+        #quit connection
+
 
     except Exception as e:
         print("error open serial port: ", e)
