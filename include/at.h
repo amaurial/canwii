@@ -1,4 +1,4 @@
-/* 
+/*
  * File	: at.h
  * This file is part of Espressif's AT+ command set program.
  * Copyright (C) 2013 - 2016, Espressif Systems
@@ -69,7 +69,7 @@
 #define CMD_MPINFO 0x27
 #define CMD_IPD 0x28
 #define CMD_MERG_CONFIG_AP_EXT 0x29
-#define CMD_MERG_CONFIG_AP 0x30
+#define CMD_MERG_CONFIG_AP 0x2a
 
 #define CMD_QUERY '?'
 #define CMD_EQUAL '='

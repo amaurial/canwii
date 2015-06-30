@@ -45,7 +45,7 @@ CMD_CIPAPPUP = "\x25"
 CMD_ATE = "\x26"
 CMD_MPINFO = "\x27"
 CMD_MERG = "\x29"
-CMD_MERG_AP= "\x30"
+CMD_MERG_AP= "\x2a"
 
 CANWII_SOH = "\x01"
 CANWII_EOH = "\x04"
@@ -67,12 +67,12 @@ def sendCommand(command,timewait=0):
         try:
             #write data
             print("write data:" , command, end='\n')
-            print("write data binary:" , command.encode(), end='\n')
-            ser.write(command.encode())
+            print("write data binary:" , command.encode('ascii'), end='\n')
+            ser.write(command.encode('ascii'))
             #ser.flush()
             time.sleep(timewait)  #give the serial port sometime to receive the data
             numOfLines = 0
-            #print("read1");
+            print("read1");
             response=ser.read(255)
 
             #response = ser.readline()
@@ -80,24 +80,24 @@ def sendCommand(command,timewait=0):
             while True:
                 numOfLines = numOfLines + 1
                 if len(cmdResponse)>0:
-                    #print("read2");
-                    if checkReceived(cmdResponse.decode())>=0:
-                        #print("read3");
-                        return cmdResponse.decode()
+                    print("read2");
+                    if checkReceived(cmdResponse.decode('ascii'))>=0:
+                        print("read3");
+                        return cmdResponse.decode('ascii')
                         break
                 if ((numOfLines >= 30) and (len(response) == 0)):
-                    return cmdResponse.decode()
+                    return cmdResponse.decode('ascii')
                     break
                 #response = ser.readline()
-                #print("read4");
+                print("read4");
                 response=ser.read(255)
                 cmdResponse = cmdResponse + response
-                print("read data: " , cmdResponse.decode(),end='\n')
+                print("read data: " , cmdResponse.decode('ascii'),end='\n')
                 print("read data binary: " , cmdResponse,end='\n')
 
 
         except Exception as e1:
-            print('error communicating...: ',e1,end='\n')
+            print('sendc command error communicating...: ',e1,end='\n')
             ser.close()
     else:
 
@@ -109,7 +109,7 @@ def resetEsp():
             #write data
             print("write data:" , "RESET", end='\n')
             command=CANWII_SOH + CMD_RST + CANWII_EOH
-            ser.write(command.encode())
+            ser.write(command.encode('ascii'))
             time.sleep(5)  #give the serial port sometime to receive the data
 
 
@@ -126,7 +126,7 @@ def checkReceived(data):
 
     temp=" "
     temp=data
-
+    print("check command received\n")
     #print ("data:",len(temp),end='\n')
     if len(temp)<1:
         return -1
@@ -366,7 +366,7 @@ def setupMergServer():
 #                <PORT>
 #        <EOH>
 #        */
-    resp=sendCommand(CANWII_SOH + CMD_MERG_AP + "=" + "esp,123,100" + "\x30" + CANWII_EOH,2)
+    resp=sendCommand(CANWII_SOH + CMD_MERG_AP + "=" + "esp,123,100" + CANWII_EOH,2)
 
     if checkReceived(resp)!=0:
         print ("Failed to set merg mode\n")
@@ -457,9 +457,9 @@ if ser.isOpen():
         if checkReceived(resp)!=0:
             print ("No OK found\n")
 
-        resp=sendCommand(CANWII_SOH + CMD_CWLAP + CANWII_EOH)
-        if checkReceived(resp)!=0:
-            print ("No OK found\n")
+       # resp=sendCommand(CANWII_SOH + CMD_CWLAP + CANWII_EOH)
+       # if checkReceived(resp)!=0:
+       #     print ("No OK found\n")
 
         #if setupWifiClient():
         #     #sendCommand("quit")

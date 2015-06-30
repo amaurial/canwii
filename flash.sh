@@ -11,8 +11,8 @@ PORT=$1
 WHICH=$2
 
 
-ATAPP=canwii_app_0x40000.bin
-ESPSDK=esp_sdk_0x00000.bin
+ATAPP=canwii_app_0x00000.bin
+ESPSDK=esp_sdk_0x40000.bin
 
 if [ "$WHICH" == "both" ];then
    echo "Flashing SDK and APP" 
