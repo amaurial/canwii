@@ -85,5 +85,6 @@ void at_setupCmdCipsto(uint8_t id, char *pPara);
 
 void at_sendData(char *pdata, unsigned short len,uint8_t linkId);
 void ipSendData(uint8_t *pAtRcvData,uint8_t linkid,uint16_t length);
+void sendData(char *pdata, unsigned short len,uint8_t linkId);
 
 #endif

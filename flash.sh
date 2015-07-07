@@ -1,9 +1,13 @@
 #!/bin/bash
+ESPAT=`pwd`
+cd ..
+ESPSDK=`pwd`
+cd $ESPAT
 
 
-export PATH=$HOME/apps/esp/esptool/:$PATH
+#export PATH=$HOME/apps/esp/esptool/:$PATH
 
-export ESPSDK=$HOME/apps/esp/sdk
+#export ESPSDK=$HOME/apps/esp/sdk
 
 cd $ESPSDK/bin
 
@@ -21,3 +25,4 @@ if [ "$WHICH" == "both" ];then
 fi
 
 esptool.py --port $PORT -b 115200 write_flash 0x00000 $ATAPP 
+cd $ESPAT

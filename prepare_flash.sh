@@ -1,8 +1,15 @@
 #!/bin/sh
-export ESPSDK=$HOME/apps/esp/sdk
-export ESPAT=$ESPSDK/canwii
+
+ESPAT=`pwd`
+cd ..
+ESPSDK=`pwd`
+cd $ESPAT
+
+#export ESPSDK=$HOME/apps/esp/sdk
+#export ESPSDK=$HOME/Projects/esp8266-wiki/esp_iot_sdk_v1.0.0
+#export ESPAT=$ESPSDK/canwii
 #export PATH=/opt/esp/esptool/:$PATH
-export PATH=$HOME/apps/esp/esptool/:$PATH
+#export PATH=$HOME/apps/esp/esptool/:$PATH
 
 echo "ESPSDK:$ESPSDK"
 echo "ESP AT:$ESPAT"

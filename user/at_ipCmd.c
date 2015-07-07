@@ -358,8 +358,9 @@ at_udpclient_recv(void *arg, char *pdata, unsigned short len)
 void ICACHE_FLASH_ATTR
 at_sendData(char *pdata, unsigned short len,uint8_t linkId)
 {
-    char temp[32];
+
 #ifdef VERBOSE
+      char temp[32];
       os_printf("recv\n");
       if(at_ipMux)
       {
@@ -383,28 +384,42 @@ at_sendData(char *pdata, unsigned short len,uint8_t linkId)
       os_printf("recv\n");
       if(at_ipMux)
       {
-        os_sprintf(temp, "%c%c%c%c",CANWII_SOH,CMD_IPD,linkId, len);
-        uart0_sendStr(temp);
-        uart0_tx_buffer(pdata, len);
-        uart_tx_one_char(CANWII_EOH);
+            sendData(pdata,len,linkId);
       }
       else if(IPMODE == FALSE)
       {
-        //fixed link 255
-        os_sprintf(temp, "%c%c%c%c",CANWII_SOH,CMD_IPD,255, len);
-        uart0_sendStr(temp);
-        uart0_tx_buffer(pdata, len);
-        uart_tx_one_char(CANWII_EOH);
+            sendData(pdata,len,255);
       }
       else
       {
-        os_sprintf(temp, "%c%c%c%c",CANWII_SOH,CMD_IPD,255, len);
-        uart0_tx_buffer(pdata, len);
-        uart_tx_one_char(CANWII_EOH);
-        return;
+            sendData(pdata,len,255);
       }
       //at_backOk;
     #endif // VERBOSE
+}
+
+void ICACHE_FLASH_ATTR
+sendData(char *pdata, unsigned short len,uint8_t linkId){
+    if (len<=255){
+        char temp[4];
+        os_sprintf(temp, "%c%c%d%c",CANWII_SOH,CMD_IPD,linkId, len);
+        //uart0_sendStr(temp);
+        uart0_tx_buffer(temp, 4);
+        uart0_tx_buffer(pdata, len);
+        uart_tx_one_char(CANWII_EOH);
+    }
+    else{
+        //calculate how many messages
+        int n=len/255;
+        int m=len%255;
+        int l=len;
+        int i;
+        n=m>0?n++:n;
+        for (i=0;i<n;i++){
+            l=(i==n-1)?m:255;
+            sendData(pdata,l,linkId);
+        }
+    }
 }
 
 /**
