@@ -1,8 +1,26 @@
-__author__ = 'amaurial'
-
 # !/usr/bin/python3
-
+from optparse import OptionParser
 import serial, time
+
+
+parser = OptionParser()
+parser.add_option("-p", "--port", dest="port", default="/dev/ttyUSB0",
+                  help="Serial port", metavar="PORT")
+parser.add_option("-b", "--binary", action="store_true", dest="binary", default=False,
+                  help="Print strings in binary", metavar="BINARY")
+parser.add_option("-l", "--listen", action="store_true", dest="listen", default=False,
+                  help="Just listen the port", metavar="LISTEN")
+#parser.add_option("-q", "--quiet",
+#                  action="store_false", dest="verbose", default=True,
+#                  help="don't print status messages to stdout")
+
+(options, args) = parser.parse_args()
+
+if options.port == None:
+    print ("Inform the port.")
+    options.usage
+    exit()
+
 
 #initialization and open the port
 
@@ -66,8 +84,9 @@ def sendCommand(command,timewait=0):
     if ser.isOpen():
         try:
             #write data
-            print("write data:" , command, end='\n')
-            print("write data binary:" , command.encode('ascii'), end='\n')
+            if options.binary:
+                print("write data binary:" , command, end='\n')
+            print("write data ascii:" , command.encode('ascii'), end='\n')
             ser.write(command.encode('ascii'))
             #ser.flush()
             time.sleep(timewait)  #give the serial port sometime to receive the data
@@ -78,30 +97,34 @@ def sendCommand(command,timewait=0):
             #response = ser.readline()
             cmdResponse = response
             while True:
-                numOfLines = numOfLines + 1
-                if len(cmdResponse)>0:
-                    print("read2");
-                    if checkReceived(cmdResponse.decode('ascii'))>=0:
-                        print("read3");
+                if ser.isOpen():
+                    numOfLines = numOfLines + 1
+                    if len(cmdResponse)>0:
+                        print("read2");
+                        if checkReceived(cmdResponse.decode('ascii'))>=0:
+                            print("read3");
+                            return cmdResponse.decode('ascii')
+                            break
+                    if ((numOfLines >= 30) and (len(response) == 0)):
                         return cmdResponse.decode('ascii')
                         break
-                if ((numOfLines >= 30) and (len(response) == 0)):
-                    return cmdResponse.decode('ascii')
-                    break
-                #response = ser.readline()
-                print("read4");
-                response=ser.read(255)
-                cmdResponse = cmdResponse + response
-                print("read data: " , cmdResponse.decode('ascii'),end='\n')
-                print("read data binary: " , cmdResponse,end='\n')
-
+                    #response = ser.readline()
+                    print("read4");
+                    response=ser.read(255)
+                    cmdResponse = cmdResponse + response
+                    print("read data ascii: " , cmdResponse.decode('ascii'),end='\n')
+                    if options.binary:
+                        print("read data binary: " , cmdResponse,end='\n')
+                else:
+                    print ("Reopening Serial Port.")
+                    reopenSerial()
 
         except Exception as e1:
             print('sendc command error communicating...: ',e1,end='\n')
             ser.close()
     else:
 
-        print("cannot open serial port ")
+        print("send command - cannot open serial port.")
 
 def resetEsp():
     if ser.isOpen():
@@ -411,8 +434,11 @@ def readServerData():
         try:
             while True:
                 response = ser.readline()
+                bindata=response
                 if len(response)>0:
-                    print(response,end='\n')
+                    print("data ascii: " + response.decode("ascii"),end='\n')
+                    if options.binary:
+                        print("data binary: " + bindata,end='\n')
                     if (response.decode().find("quit")>=0):
                         return True
         except Exception as e:
@@ -424,22 +450,25 @@ def reopenSerial():
     for i in range (1,10):
         try:
             ser.open()
+            time.sleep(2)
             return
         except Exception as e:
             print("error open serial port: " + e)
     exit()
 
+def testComands():
+    for k,v in CMDS.items():
+        print("Testing ",k,end='\n')
+        sendCommand(CANWII_SOH + v + CANWII_TEST+ CANWII_EOH)
 
 ser = serial.Serial()
-ser.port = "/dev/ttyUSB0"
-#ser.port = "/dev/ttyS2"
+ser.port = options.port
 ser.baudrate = 115200
 ser.bytesize = serial.EIGHTBITS  #number of bits per bytes
 ser.parity = serial.PARITY_NONE  #set parity check: no parity
 ser.stopbits = serial.STOPBITS_ONE  #number of stop bits
 #ser.timeout = None          #block read
 ser.timeout = 1  #non-block read
-#ser.timeout = 2              #timeout block read
 ser.xonxoff = False  #disable software flow control
 ser.rtscts = False  #disable hardware (RTS/CTS) flow control
 ser.dsrdtr = False  #disable hardware (DSR/DTR) flow control
@@ -448,61 +477,72 @@ reopenSerial()
 
 if ser.isOpen():
     try:
-        #for k,v in CMDS.items():
-        #    print("Testing ",k,end='\n')
-        #    sendCommand(CANWII_SOH + v + CANWII_TEST+ CANWII_EOH)
-        print ("Sending AT")
-        resp=sendCommand(CANWII_SOH + CMD_AT + CANWII_EOH)
-        print ("AT received")
-        if checkReceived(resp)!=0:
-            print ("No OK found\n")
 
-       # resp=sendCommand(CANWII_SOH + CMD_CWLAP + CANWII_EOH)
-       # if checkReceived(resp)!=0:
-       #     print ("No OK found\n")
+        if options.listen:
+            while True:
+                if ser.isOpen():
+                    response=ser.read(255)
+                    if len(response) >0 :
+                        print("read data ascii: " , response.decode('ascii'),end='\n')
+                        if options.binary:
+                            print("read data binary: " , response,end='\n')
+                else:
+                    print ("Reopening Serial Port.")
+                    reopenSerial()
+        else:
 
-        #if setupWifiClient():
-        #     #sendCommand("quit")
-        #     if connectToServer("192.168.1.119","9999"):
-        #         sendSomeData()
+            print ("Sending AT")
+            resp=sendCommand(CANWII_SOH + CMD_AT + CANWII_EOH)
+            print ("AT received")
+            if checkReceived(resp)!=0:
+                print ("No OK found\n")
 
-        #if setupWifiServer():
-        #   readServerData()
-        #if setupApServer():
-        if setupMergServer():
-            #ser.close()
-            #time.sleep(5);
-            #reopenSerial()
-            print ("Set AP OK\n")
+           # resp=sendCommand(CANWII_SOH + CMD_CWLAP + CANWII_EOH)
+           # if checkReceived(resp)!=0:
+           #     print ("No OK found\n")
 
-            if readServerData()==False:
-                sendCommand(CANWII_SOH + CMD_CIPCLOSE + "=5" + CANWII_EOH)
-                exit()
+            #if setupWifiClient():
+            #     #sendCommand("quit")
+            #     if connectToServer("192.168.1.119","9999"):
+            #         sendSomeData()
+
+            #if setupWifiServer():
+            #   readServerData()
+            #if setupApServer():
+            if setupMergServer():
+                #ser.close()
+                #time.sleep(5);
+                #reopenSerial()
+                print ("Set AP OK\n")
+
+                if readServerData()==False:
+                    sendCommand(CANWII_SOH + CMD_CIPCLOSE + "=5" + CANWII_EOH)
+                    exit()
 
 
-        #print("Putting ESP in AP mode\n")
-        #if setupApWifiServer():
-            # print("Reseting\n")
-            # resetEsp()
-            # print("Closing serial comm and slepping\n")
-            # ser.close()
-            # time.sleep(10)
-            # print("Try to open serial comm\n")
-            # ser.open()
-            # print("Try to open serial comm\n")
-            # if (ser.isOpen()):
-            #     print("Waiting for connections\n")
-            # else:
-            #     print("Failed to reopen serial comm\n")
+            #print("Putting ESP in AP mode\n")
+            #if setupApWifiServer():
+                # print("Reseting\n")
+                # resetEsp()
+                # print("Closing serial comm and slepping\n")
+                # ser.close()
+                # time.sleep(10)
+                # print("Try to open serial comm\n")
+                # ser.open()
+                # print("Try to open serial comm\n")
+                # if (ser.isOpen()):
+                #     print("Waiting for connections\n")
+                # else:
+                #     print("Failed to reopen serial comm\n")
 
-         #   if setupApServer():
-         #      readServerData()
+             #   if setupApServer():
+             #      readServerData()
 
-        #quit connection
+            #quit connection
 
 
     except Exception as e:
-        print("error open serial port: ", e)
+        print("general error : ", e)
         ser.close()
 
     finally:

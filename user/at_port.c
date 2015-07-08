@@ -24,7 +24,6 @@
   * @{
   */
 #define at_cmdLenMax 128
-#define at_dataLenMax 2048
 /**
   * @}
   */
@@ -58,7 +57,7 @@ uint8_t *pDataLine;
 BOOL echoFlag = FALSE;
 
 static uint8_t at_cmdLine[CMD_BUFFER_SIZE];
-uint8_t at_dataLine[at_dataLenMax];
+uint8_t at_dataLine[MSG_MAX_BUFFER_SIZE];
 /** @defgroup AT_PORT_Functions
   * @{
   */
@@ -175,7 +174,7 @@ at_recvTask(os_event_t *events)
 
     case at_statIpSending:
       *pDataLine = temp;
-      if((pDataLine >= &at_dataLine[at_sendLen - 1]) || (pDataLine >= &at_dataLine[at_dataLenMax - 1]))
+      if((pDataLine >= &at_dataLine[at_sendLen - 1]) || (pDataLine >= &at_dataLine[MSG_MAX_BUFFER_SIZE - 1]))
       {
         system_os_post(at_procTaskPrio, 0, 0);
         at_state = at_statIpSended;
@@ -203,13 +202,13 @@ at_recvTask(os_event_t *events)
     case at_statIpTraning:
       os_timer_disarm(&at_delayCheck);
 
-      if(pDataLine > &at_dataLine[at_dataLenMax - 1])
+      if(pDataLine > &at_dataLine[MSG_MAX_BUFFER_SIZE - 1])
       {
         os_timer_arm(&at_delayCheck, 0, 0);
         os_printf("exceed\n");
         return;
       }
-      else if(pDataLine == &at_dataLine[at_dataLenMax - 1])
+      else if(pDataLine == &at_dataLine[MSG_MAX_BUFFER_SIZE - 1])
       {
         temp = READ_PERI_REG(UART_FIFO(UART0)) & 0xFF;
         *pDataLine = temp;

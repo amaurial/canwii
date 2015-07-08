@@ -338,6 +338,13 @@ at_udpclient_recv(void *arg, char *pdata, unsigned short len)
   at_sendData(pdata,len,linkTemp->linkId);
 }
 
+/**
+  * @brief  Send data back to client connected to esp
+  * @param  pdata: received data
+  * @param  len: the lenght of received data
+  * @param  linkid: id of the link where the message was received
+  * @retval None
+*/
 void ICACHE_FLASH_ATTR
 at_sendData(char *pdata, unsigned short len,uint8_t linkId)
 {
@@ -366,24 +373,27 @@ at_sendData(char *pdata, unsigned short len,uint8_t linkId)
       os_printf("recv\n");
       if(at_ipMux)
       {
-        os_sprintf(temp, "%d%d%d%d\n",CANWII_SOH,CMD_IPD,linkId, len);
+        os_sprintf(temp, "%d%d%d%d",CANWII_SOH,CMD_IPD,linkId, len);
         uart0_sendStr(temp);
         uart0_tx_buffer(pdata, len);
         uart_tx_one_char(CANWII_EOH);
       }
       else if(IPMODE == FALSE)
       {
-        os_sprintf(temp, "%d%d%d%d\n",CANWII_SOH,CMD_IPD,255, len);
+        //fixed link 255
+        os_sprintf(temp, "%d%d%d%d",CANWII_SOH,CMD_IPD,255, len);
         uart0_sendStr(temp);
         uart0_tx_buffer(pdata, len);
         uart_tx_one_char(CANWII_EOH);
       }
       else
       {
+        os_sprintf(temp, "%d%d%d%d",CANWII_SOH,CMD_IPD,255, len);
         uart0_tx_buffer(pdata, len);
+        uart_tx_one_char(CANWII_EOH);
         return;
       }
-      at_backOk;
+      //at_backOk;
     #endif // VERBOSE
 }
 
@@ -411,7 +421,7 @@ at_tcpclient_sent_cb(void *arg)
   //TODO:change message
   generalMSG.msgid=MSG_SEND;
   generalMSG.param0=NULLPARAM;
-  sendGeneralMsg(generalMSG);
+  //sendGeneralMsg(generalMSG);
   //uart0_sendStr("\nSEND OK\n");
 }
 
@@ -447,7 +457,7 @@ at_tcpclient_connect_cb(void *arg)
     //TODO:change message
     generalMSG.msgid=MSG_CONNECT;
     generalMSG.param0=linkTemp->linkId;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
     //os_sprintf(temp,"%d,CONNECT\n", linkTemp->linkId);
     //uart0_sendStr(temp);
   }
@@ -456,7 +466,7 @@ at_tcpclient_connect_cb(void *arg)
     //TODO:change message
     generalMSG.msgid=MSG_CONNECT;
     generalMSG.param0=-1;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
     //uart0_sendStr("CONNECT\n");
   }
   at_backOk;
@@ -497,7 +507,7 @@ at_tcpclient_recon_cb(void *arg, sint8 errType)
   //TODO: change the message
     generalMSG.msgid=MSG_CLOSED;
     generalMSG.param0=linkTemp->linkId;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
   //os_sprintf(temp,"%d,CLOSED\n", linkTemp->linkId);
   //uart0_sendStr(temp);
 
@@ -621,7 +631,7 @@ at_dns_found(const char *name, ip_addr_t *ipaddr, void *arg)
       //TODO: change the message
       generalMSG.msgid=MSG_CONNECT;
       generalMSG.param0=linkTemp->linkId;
-      sendGeneralMsg(generalMSG);
+      //sendGeneralMsg(generalMSG);
       //os_sprintf(temp,"%d,CONNECT\n", linkTemp->linkId);
       //uart0_sendStr(temp);
       at_backOk;
@@ -878,7 +888,7 @@ at_setupCmdCipstart(uint8_t id, char *pPara)
       //TODO: change the message
       generalMSG.msgid=MSG_CONNECT;
       generalMSG.param0=linkID;
-      sendGeneralMsg(generalMSG);
+      //sendGeneralMsg(generalMSG);
       //os_sprintf(temp,"%d,CONNECT\n", linkID);
       //uart0_sendStr(temp);
       at_linkNum++;
@@ -931,7 +941,7 @@ at_tcpclient_discon_cb(void *arg)
     //TODO: change the message
     generalMSG.msgid=MSG_CLOSED;
     generalMSG.param0=linkTemp->linkId;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
     //os_sprintf(temp,"%d,CLOSED\n", linkTemp->linkId);
     //uart0_sendStr(temp);
   }
@@ -940,7 +950,7 @@ at_tcpclient_discon_cb(void *arg)
     //TODO: change the message
     generalMSG.msgid=MSG_CLOSED;
     generalMSG.param0=NULLPARAM;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
     //uart0_sendStr("CLOSED\n");
   }
 
@@ -983,7 +993,7 @@ at_tcpclient_discon_cb(void *arg)
           //TODO: change the message
           generalMSG.msgid=MSG_CLOSED;
           generalMSG.param0=pLink[idTemp].linkId;
-          sendGeneralMsg(generalMSG);
+          //sendGeneralMsg(generalMSG);
           //os_sprintf(temp,"%d,CLOSED\n", pLink[idTemp].linkId);
           //uart0_sendStr(temp);
           pLink[idTemp].linkEn = FALSE;
@@ -1272,12 +1282,6 @@ at_setupCmdCipsend(uint8_t id, char *pPara)
       return;
     }
     pPara++;
-    if(*pPara != ',') //ID must less 10
-    {
-      at_backError;
-      return;
-    }
-    pPara++;
   }
   else
   {
@@ -1285,40 +1289,34 @@ at_setupCmdCipsend(uint8_t id, char *pPara)
   }
   if(pLink[sendingID].linkEn == FALSE)
   {
-    //TODO: change the message
     generalMSG.msgid=MSG_LINK_SET_FAIL;
     generalMSG.param0=pLink[sendingID].linkId;
     sendGeneralMsg(generalMSG);
-    //uart0_sendStr("link is not\n");
     return;
   }
-  at_sendLen = atoi(pPara);
-  if(at_sendLen > 2048)
+
+  //get the message until eoh
+  char temp[MSG_MAX_BUFFER_SIZE];
+  int i=0;
+  for (i=0;i<(MSG_MAX_BUFFER_SIZE+1);i++){
+    if (*pPara == CANWII_EOH ){
+        break;
+    }
+    temp[i] = *pPara;
+    pPara++;
+  }
+  at_sendLen=i;
+
+  if(at_sendLen >= MSG_MAX_BUFFER_SIZE)
   {
-    //TODO: change the message
     generalMSG.msgid=MSG_TOO_LONG;
     generalMSG.param0=at_sendLen;
     sendGeneralMsg(generalMSG);
-    //uart0_sendStr("too long\n");
     return;
   }
-  pPara = at_checkLastNum(pPara, 5);
-  if((pPara == NULL)||(*pPara != CANWII_EOH))
-  {
-    //TODO: change the message
-    generalMSG.msgid=MSG_TYPE_ERROR;
-    generalMSG.param0=NULLPARAM;
-    sendGeneralMsg(generalMSG);
-    //uart0_sendStr("type error\n");
-    return;
-  }
-
-  pDataLine = at_dataLine;
-
-  specialAtState = FALSE;
-  at_state = at_statIpSending;
-  //TODO:Review
-  uart0_sendStr("> ");
+    //send data
+    ipSendData(temp,sendingID,at_sendLen);
+    at_state = at_statIdle;
 }
 
 /**
@@ -1331,6 +1329,42 @@ at_ipDataSending(uint8_t *pAtRcvData)
 {
   espconn_sent(pLink[sendingID].pCon, pAtRcvData, at_sendLen);
   os_printf("id:%d,Len:%d,dp:%p\n",sendingID,at_sendLen,pAtRcvData);
+  //bug if udp,send is ok
+//  if(pLink[sendingID].pCon->type == ESPCONN_UDP)
+//  {
+//    uart0_sendStr("\r\nSEND OK\r\n");
+//    specialAtState = TRUE;
+//    at_state = at_statIdle;
+//  }
+}
+
+/**
+  * @brief  General send data through ip. Used to send data to remote host.
+  * @param  pAtRcvData: point to data
+  * @param  linkid: link where client is connected
+  * @param  length: size of the buffer limited by MSG_MAX_BUFFER_SIZE
+  * @retval None
+  */
+void ICACHE_FLASH_ATTR
+ipSendData(uint8_t *pAtRcvData,uint8_t linkid,uint16_t length)
+{
+
+  //sanity check
+  if (linkid>at_linkMax){
+    generalMSG.msgid=MSG_LINK_SET_FAIL;
+    generalMSG.param0=pLink[sendingID].linkId;
+    sendGeneralMsg(generalMSG);
+    return;
+  }
+  if (length>MSG_MAX_BUFFER_SIZE){
+    generalMSG.msgid=MSG_TOO_LONG;
+    generalMSG.param0=at_sendLen;
+    sendGeneralMsg(generalMSG);
+    return;
+  }
+
+  espconn_sent(pLink[linkid].pCon, pAtRcvData, length);
+  os_printf("id:%d,Len:%d,dp:%p\n",linkid,length,pAtRcvData);
   //bug if udp,send is ok
 //  if(pLink[sendingID].pCon->type == ESPCONN_UDP)
 //  {
@@ -1568,7 +1602,7 @@ at_tcpserver_recon_cb(void *arg, sint8 errType)
     //TODO: change the message
     generalMSG.msgid=MSG_CONNECT;
     generalMSG.param0=linkTemp->linkId;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
     //os_sprintf(temp, "%d,CONNECT\n", linkTemp->linkId);
     //uart0_sendStr(temp);
   }
@@ -1577,7 +1611,7 @@ at_tcpserver_recon_cb(void *arg, sint8 errType)
     //TODO: change the message
     generalMSG.msgid=MSG_CONNECT;
     generalMSG.param0=NULLPARAM;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
     //uart0_sendStr("CONNECT\n");
   }
   disAllFlag = false;
@@ -1630,19 +1664,18 @@ at_tcpserver_listen(void *arg)
   espconn_regist_sentcb(pespconn, at_tcpclient_sent_cb);///////
   if(at_ipMux)
   {
-    //TODO: change the message
+
     generalMSG.msgid=MSG_CONNECT;
     generalMSG.param0=i;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
     //os_sprintf(temp, "%d,CONNECT\n", i);
     //uart0_sendStr(temp);
   }
   else
   {
-    //TODO: change the message
     generalMSG.msgid=MSG_CONNECT;
     generalMSG.param0=NULLPARAM;
-    sendGeneralMsg(generalMSG);
+    //sendGeneralMsg(generalMSG);
     //uart0_sendStr("CONNECT\n");
   }
 }

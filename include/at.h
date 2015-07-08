@@ -95,6 +95,9 @@
 #define TCP_SERVER_TIMEOUT 120//seconds
 
 
+#define at_linkMax 5
+#define MSG_MAX_BUFFER_SIZE 2048
+
 typedef enum{
   at_statIdle,
   at_statRecving,

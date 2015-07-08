@@ -29,7 +29,6 @@
 #include <stdlib.h>
 #include "upgrade.h"
 
-#define at_linkMax 5
 
 typedef enum
 {
@@ -85,5 +84,6 @@ void at_queryCmdCipsto(uint8_t id);
 void at_setupCmdCipsto(uint8_t id, char *pPara);
 
 void at_sendData(char *pdata, unsigned short len,uint8_t linkId);
+void ipSendData(uint8_t *pAtRcvData,uint8_t linkid,uint16_t length);
 
 #endif
