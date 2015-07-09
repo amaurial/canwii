@@ -65,7 +65,7 @@ at_testCmdGeneric(uint8_t id)
     #ifdef VERBOSE
         os_sprintf(temp, "%s:(1-3)\n", at_fun[id].at_cmdName);
     #else
-        os_sprintf(temp, "%d%d%d\n",CANWII_SOH, at_fun[id].at_cmdCode,CANWII_EOH);
+        os_sprintf(temp, "%c%c%c",CANWII_SOH, at_fun[id].at_cmdCode,CANWII_EOH);
     #endif // VERBOSE
     uart0_sendStr(temp);
     at_backOk;
@@ -92,7 +92,7 @@ at_setupCmdCifsr(uint8_t id, char *pPara)
     #ifdef VERBOSE
         uart0_sendStr("IP ERROR\n");
     #else
-        os_sprintf(temp, "%d%d%d\n",CANWII_SOH, RSP_IP_ERROR,CANWII_EOH);
+        os_sprintf(temp, "%c%d%c",CANWII_SOH, RSP_IP_ERROR,CANWII_EOH);
     #endif // VERBOSE
     uart0_sendStr(temp);
 
@@ -147,7 +147,7 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
     #else
         //<SOH><CMD><P1><IP><P2><MAC><EOH>
 
-        os_sprintf(temp, "%d%d%d%d.%d.%d.%s%d\n",CANWII_SOH, at_fun[id].at_cmdCode,
+        os_sprintf(temp, "%c%c%d%d.%d.%d.%s%c",CANWII_SOH, at_fun[id].at_cmdCode,
                     1,IP2STR(&pTempIp.ip),2,MAC2STR(bssid),CANWII_EOH);
         uart0_sendStr(temp);
     #endif // VERBOSE
@@ -176,7 +176,7 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
                    MAC2STR(bssid));
         uart0_sendStr(temp);
     #else
-        os_sprintf(temp, "%d%d%d%d.%d.%d.%s%d\n",CANWII_SOH, at_fun[id].at_cmdCode,
+        os_sprintf(temp, "%c%c%d%d.%d.%d.%s%c\n",CANWII_SOH, at_fun[id].at_cmdCode,
                     1,IP2STR(&pTempIp.ip),2,MAC2STR(bssid),CANWII_EOH);
         uart0_sendStr(temp);
     #endif // VERBOSE
@@ -202,7 +202,7 @@ at_exeCmdCipstatus(uint8_t id)
         os_sprintf(temp, "STATUS:%d\n",
          mdState);
     #else
-        os_sprintf(temp, "%d%d\n",CANWII_SOH, CMD_CIPSTATUS);
+        //os_sprintf(temp, "%c%c\n",CANWII_SOH, CMD_CIPSTATUS);
     #endif // VERBOSE
   uart0_sendStr(temp);
   if(serverEn)
@@ -225,12 +225,13 @@ at_exeCmdCipstatus(uint8_t id)
                    pLink[i].pCon->proto.tcp->remote_port,
                    pLink[i].teType);
         #else
-            os_sprintf(temp, "%d,%d,%d.%d.%d.%d,%d,%d\n",
+            os_sprintf(temp, "%c%c%d,%c,%d.%d.%d.%d,%d,%d%c",
+                   CANWII_SOH, CMD_CIPSTATUS,
                    pLink[i].linkId,
                    CANWII_TCP,
                    IP2STR(pLink[i].pCon->proto.tcp->remote_ip),
                    pLink[i].pCon->proto.tcp->remote_port,
-                   pLink[i].teType);
+                   pLink[i].teType,CANWII_EOH);
             uart0_sendStr(temp);
         #endif // VERBOSE
       }
@@ -246,20 +247,29 @@ at_exeCmdCipstatus(uint8_t id)
                    pLink[i].pCon->proto.udp->local_port,
                    pLink[i].teType);
         #else
-            os_sprintf(temp, "%d,%d,%d.%d.%d.%d,%d,%d\n",
+            os_sprintf(temp, "%c%c%d,%d,%d.%d.%d.%d,%d,%d%c",
+                   CANWII_SOH, CMD_CIPSTATUS,
                    pLink[i].linkId,
                    CANWII_UDP,
                    IP2STR(pLink[i].pCon->proto.tcp->remote_ip),
                    pLink[i].pCon->proto.tcp->remote_port,
-                   pLink[i].teType);
+                   pLink[i].teType,CANWII_EOH);
             uart0_sendStr(temp);
         #endif // VERBOSE
 
       }
 
     }
+    else {
+        #ifdef VERBOSE
+        //os_sprintf(temp, "STATUS:%d\n",
+         //mdState);
+        #else
+            os_sprintf(temp, "%c%c%c",CANWII_SOH, CMD_CIPSTATUS,CANWII_EOH);
+        #endif // VERBOSE
+    }
   }
-  uart_tx_one_char(CANWII_EOH);
+  //uart_tx_one_char(CANWII_EOH);
   at_backOk;
 }
 
@@ -373,7 +383,7 @@ at_sendData(char *pdata, unsigned short len,uint8_t linkId)
       os_printf("recv\n");
       if(at_ipMux)
       {
-        os_sprintf(temp, "%d%d%d%d",CANWII_SOH,CMD_IPD,linkId, len);
+        os_sprintf(temp, "%c%c%d%c",CANWII_SOH,CMD_IPD,linkId, len);
         uart0_sendStr(temp);
         uart0_tx_buffer(pdata, len);
         uart_tx_one_char(CANWII_EOH);
@@ -381,14 +391,14 @@ at_sendData(char *pdata, unsigned short len,uint8_t linkId)
       else if(IPMODE == FALSE)
       {
         //fixed link 255
-        os_sprintf(temp, "%d%d%d%d",CANWII_SOH,CMD_IPD,255, len);
+        os_sprintf(temp, "%c%c%c%c",CANWII_SOH,CMD_IPD,255, len);
         uart0_sendStr(temp);
         uart0_tx_buffer(pdata, len);
         uart_tx_one_char(CANWII_EOH);
       }
       else
       {
-        os_sprintf(temp, "%d%d%d%d",CANWII_SOH,CMD_IPD,255, len);
+        os_sprintf(temp, "%c%c%c%c",CANWII_SOH,CMD_IPD,255, len);
         uart0_tx_buffer(pdata, len);
         uart_tx_one_char(CANWII_EOH);
         return;
@@ -1465,7 +1475,7 @@ at_queryCmdCipmux(uint8_t id)
   #ifdef VERBOSE
     os_sprintf(temp, "%s:%d\n",at_fun[id].at_cmdName, at_ipMux);
   #else
-    os_sprintf(temp, "%d%d%d%d\n",CANWII_SOH,at_fun[id].at_cmdCode, at_ipMux,CANWII_EOH);
+    os_sprintf(temp, "%c%c%d%c",CANWII_SOH,at_fun[id].at_cmdCode, at_ipMux,CANWII_EOH);
   #endif // VERBOSE
 
   uart0_sendStr(temp);
@@ -1867,7 +1877,7 @@ at_queryCmdCipmode(uint8_t id)
   #ifdef VERBOSE
     os_sprintf(temp, "%s:%d\n", at_fun[id].at_cmdName, IPMODE);
   #else
-    os_sprintf(temp, "%d%d%d%d\n", CANWII_SOH,at_fun[id].at_cmdCode, IPMODE,CANWII_EOH);
+    os_sprintf(temp, "%c%c%d%c", CANWII_SOH,at_fun[id].at_cmdCode, IPMODE,CANWII_EOH);
   #endif
 
   uart0_sendStr(temp);
@@ -1917,7 +1927,7 @@ at_queryCmdCipsto(uint8_t id)
     os_sprintf(temp, "%s:%d\n",
              at_fun[id].at_cmdName, server_timeover);
   #else
-    os_sprintf(temp, "%d%d%d%d\n", CANWII_SOH,at_fun[id].at_cmdCode, server_timeover,CANWII_EOH);
+    os_sprintf(temp, "%c%c%c%c\n", CANWII_SOH,at_fun[id].at_cmdCode, server_timeover,CANWII_EOH);
   #endif
 
   uart0_sendStr(temp);

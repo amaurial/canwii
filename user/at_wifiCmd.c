@@ -46,7 +46,7 @@ at_queryCmdCwmode(uint8_t id)
   #ifdef VERBOSE
     os_sprintf(temp, "%s:%d\n", at_fun[id].at_cmdName, at_wifiMode);
   #else
-    os_sprintf(temp, "%d%d%d%d\n", CANWII_SOH, at_fun[id].at_cmdCode, at_wifiMode,CANWII_EOH);
+    os_sprintf(temp, "%c%c%d%c", CANWII_SOH, at_fun[id].at_cmdCode, at_wifiMode,CANWII_EOH);
   #endif // VERBOSE
 
   uart0_sendStr(temp);
@@ -123,7 +123,7 @@ scan_done(void *arg, STATUS status)
                  bss_link->authmode, ssid, bss_link->rssi,
                  MAC2STR(bss_link->bssid),bss_link->channel);
       #else
-        os_sprintf(temp,"%d%d%d,%d,%d,%d,%d%d\n",CANWII_SOH,CMD_CWLAP,
+        os_sprintf(temp,"%c%c%d,%s,%d,%d,%d%c",CANWII_SOH,CMD_CWLAP,
                  bss_link->authmode, ssid, bss_link->rssi,
                  MAC2STR(bss_link->bssid),bss_link->channel,CANWII_EOH);
       #endif // VERBOSE
@@ -248,7 +248,7 @@ at_queryCmdCwjap(uint8_t id)
     #ifdef VERBOSE
         os_sprintf(temp, "%s:\"%s\"\n", at_fun[id].at_cmdName, stationConf.ssid);
     #else
-        os_sprintf(temp, "%d%d%d%d\n",CANWII_SOH, at_fun[id].at_cmdCode, stationConf.ssid,CANWII_EOH);
+        os_sprintf(temp, "%c%c%s%c",CANWII_SOH, at_fun[id].at_cmdCode, stationConf.ssid,CANWII_EOH);
     #endif
 
     uart0_sendStr(temp);
@@ -291,7 +291,7 @@ at_japChack(void *arg)
     #ifdef VERBOSE
         os_sprintf(temp,"+CWJAP:%d\n",japState);
     #else
-        os_sprintf(temp,"%d%d%d%d\n",CANWII_SOH,CMD_CWJAP,japState,CANWII_EOH);
+        os_sprintf(temp,"%c%c%d%c",CANWII_SOH,CMD_CWJAP,japState,CANWII_EOH);
     #endif // VERBOSE
 
     uart0_sendStr(temp);
@@ -394,7 +394,7 @@ at_queryCmdCwsap(uint8_t id)
              apConfig.channel,
              apConfig.authmode);
   #else
-    os_sprintf(temp,"%d%d%d,%d,%d,%d%d\n",CANWII_SOH,
+    os_sprintf(temp,"%c%c%s,%s,%d,%d%c",CANWII_SOH,
              at_fun[id].at_cmdCode,
              apConfig.ssid,
              apConfig.password,
@@ -504,7 +504,7 @@ at_exeCmdCwlif(uint8_t id)
         os_sprintf(temp, "%d.%d.%d.%d,"MACSTR"\n",
                IP2STR(&station->ip), MAC2STR(station->bssid));
     #else
-        os_sprintf(temp, "%d%d%d,%d%d\n",CANWII_SOH,CMD_CWLIF,
+        os_sprintf(temp, "%c%c%d,%d%c",CANWII_SOH,CMD_CWLIF,
                IP2STR(&station->ip), MAC2STR(station->bssid),CANWII_EOH);
     #endif // VERBOSE
 
@@ -608,7 +608,7 @@ at_queryCmdCipstamac(uint8_t id)
   #ifdef VERBOSE
     os_sprintf(temp,"%s:\""MACSTR"\" %s\n", at_fun[id].at_cmdName, MAC2STR(bssid));
   #else
-    os_sprintf(temp, "%d%d%d%d\n",CANWII_SOH,at_fun[id].at_cmdCode, MAC2STR(bssid),CANWII_EOH);
+    os_sprintf(temp, "%c%c%d%c",CANWII_SOH,at_fun[id].at_cmdCode, MAC2STR(bssid),CANWII_EOH);
   #endif // VERBOSE
 
   uart0_sendStr(temp);
@@ -659,7 +659,7 @@ at_queryCmdCipapmac(uint8_t id)
   #ifdef VERBOSE
     os_sprintf(temp,"%s:\""MACSTR"\" %s\n", at_fun[id].at_cmdName, MAC2STR(bssid));
   #else
-    os_sprintf(temp, "%d%d%d%d\n",CANWII_SOH,at_fun[id].at_cmdCode, MAC2STR(bssid),CANWII_EOH);
+    os_sprintf(temp, "%c%c%d%c",CANWII_SOH,at_fun[id].at_cmdCode, MAC2STR(bssid),CANWII_EOH);
   #endif // VERBOSE
 
   uart0_sendStr(temp);
@@ -707,7 +707,7 @@ at_queryCmdCipsta(uint8_t id)
   #ifdef VERBOSE
     os_sprintf(temp, "%s:\"%d.%d.%d.%d\"\n",at_fun[id].at_cmdName, IP2STR(&pTempIp.ip));
   #else
-    os_sprintf(temp, "%d%d%d.%d.%d.%d%d\n",CANWII_SOH,at_fun[id].at_cmdCode, IP2STR(&pTempIp.ip),CANWII_EOH);
+    os_sprintf(temp, "%c%c%c.%c.%c.%c%c",CANWII_SOH,at_fun[id].at_cmdCode, IP2STR(&pTempIp.ip),CANWII_EOH);
   #endif // VERBOSE
 
   uart0_sendStr(temp);
@@ -735,7 +735,7 @@ at_setupCmdCipsta(uint8_t id, char *pPara)
   wifi_get_ip_info(0x00, &pTempIp);
   pTempIp.ip.addr = ipaddr_addr(temp);
 
-  os_printf("%d.%d.%d.%d\n",
+  os_printf("%c.%c.%d.%d\n",
                  IP2STR(&pTempIp.ip));
 
   if(!wifi_set_ip_info(0x00, &pTempIp))
@@ -758,7 +758,7 @@ at_queryCmdCipap(uint8_t id)
   #ifdef VERBOSE
     os_sprintf(temp, "%s:\"%d.%d.%d.%d\"\n",at_fun[id].at_cmdName, IP2STR(&pTempIp.ip));
   #else
-    os_sprintf(temp, "%d%d%d.%d.%d.%d%d\n",CANWII_SOH,at_fun[id].at_cmdCode, IP2STR(&pTempIp.ip),CANWII_EOH);
+    os_sprintf(temp, "%c%c%c.%c.%c.%c%c",CANWII_SOH,at_fun[id].at_cmdCode, IP2STR(&pTempIp.ip),CANWII_EOH);
   #endif // VERBOSE
 
   uart0_sendStr(temp);
@@ -786,7 +786,7 @@ at_setupCmdCipap(uint8_t id, char *pPara)
   wifi_get_ip_info(0x01, &pTempIp);
   pTempIp.ip.addr = ipaddr_addr(temp);
 
-  os_printf("%d.%d.%d.%d\n",
+  os_printf("%c.%c.%c.%c\n",
                  IP2STR(&pTempIp.ip));
 
   if(!wifi_set_ip_info(0x01, &pTempIp))

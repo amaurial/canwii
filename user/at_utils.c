@@ -320,7 +320,7 @@ sendGeneralMsg(struct_MSGType msgtype)
         }
     #else
         //char temp[5];
-        os_sprintf(temp,"%d%d%d%d%d\n",CANWII_SOH,
+        os_sprintf(temp,"%c%c%d%d%c\n",CANWII_SOH,
              CANWII_ERR,
              msgtype.msgid,
              msgtype.param0,

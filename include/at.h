@@ -38,7 +38,7 @@
 #else
     #define at_backOk        {uart_tx_one_char(CANWII_OK);}//;uart0_sendStr("\n");}
     #define at_backError     {uart_tx_one_char(CANWII_ERR);}//;uart0_sendStr("\n");}
-    #define at_backTeError   "%d" + CANWII_TE_ERR
+    #define at_backTeError   "%c" + CANWII_TE_ERR
 #endif // VERBOSE
 
 #define CMD_AT 0x0a
