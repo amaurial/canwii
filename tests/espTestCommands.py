@@ -93,7 +93,7 @@ def sendCommand(command,timewait=0):
             #ser.flush()
             time.sleep(timewait)  #give the serial port sometime to receive the data
             numOfLines = 0
-            print("read1");
+            #print("read1");
             response=ser.read(255)
 
             #response = ser.readline()
@@ -102,21 +102,22 @@ def sendCommand(command,timewait=0):
                 if ser.isOpen():
                     numOfLines = numOfLines + 1
                     if len(cmdResponse)>0:
-                        print("read2");
+                        #print("read2");
                         if checkReceived(cmdResponse.decode('ascii'))>=0:
-                            print("read3");
+                            #print("read3");
                             return cmdResponse.decode('ascii')
                             break
                     if ((numOfLines >= 30) and (len(response) == 0)):
                         return cmdResponse.decode('ascii')
                         break
                     #response = ser.readline()
-                    print("read4");
+                    #print("read4");
                     response=ser.read(255)
                     cmdResponse = cmdResponse + response
-                    print("read data ascii: " , cmdResponse.decode('ascii'),end='\n')
-                    if options.binary:
-                        print("read data binary: " , cmdResponse,end='\n')
+                    if len(response)>0:
+                        print("read data ascii: " , cmdResponse.decode('ascii'),end='\n')
+                        if options.binary:
+                            print("read data binary: " , cmdResponse,end='\n')
                 else:
                     print ("Reopening Serial Port.")
                     reopenSerial()
@@ -508,7 +509,10 @@ if ser.isOpen():
                         #print("pkconn: " , pkconn,end='\n')
                         if pkconn in response.decode('ascii') :
                             print("client connected. sending version")
-                            resp=sendCommand(CANWII_SOH + CMD_CIPSEND +"=0" + "VN2.0\n" + CANWII_EOH)
+                            resp=sendCommand(CANWII_SOH + CMD_CIPSEND +"=0" + "VN2.0\n*5\n" + CANWII_EOH)
+                        if "NEngine" in response.decode('ascii'):
+                            resp=sendCommand(CANWII_SOH + CMD_CIPSEND +"=0" + "*5\n*+\n" + CANWII_EOH)
+
                 else:
                     print ("Reopening Serial Port.")
                     reopenSerial()
