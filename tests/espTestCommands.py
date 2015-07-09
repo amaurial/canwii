@@ -155,27 +155,27 @@ def checkReceived(data):
         return -1
 
     if (temp.find("OK\n")>=0):
-        #print("Found OK\n")
+        print("Found OK\n")
         return 0
 
     if (temp.find("NO_CHANGE\n")>=0):
-        #print("Found OK\n")
+        print("Found NO Change\n")
         return 0
     if (temp.find("ERROR\n")>=0):
-        #print("Found OK\n")
+        print("Found Error\n")
         return 1
 
     if (temp.find("\n>")>=0):
-        #print("Found OK\n")
+        print("Found >\n")
         return 2
     if (temp.find("FAIL\n")>=0):
-        #print("Found OK\n")
+        print("Found FAIL\n")
         return 3
     if (temp.find((CANWII_OK))>=0):
-        #print("Found OK\n")
+        print("Found OK\n")
         return 0
     if (temp.find((CANWII_ERR))>=0):
-        #print("Found OK\n")
+        print("Found ERR\n")
         return 1
     #print("Not found OK\n")
     return -1

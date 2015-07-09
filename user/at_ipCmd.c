@@ -383,7 +383,7 @@ at_sendData(char *pdata, unsigned short len,uint8_t linkId)
       os_printf("recv\n");
       if(at_ipMux)
       {
-        os_sprintf(temp, "%c%c%d%c",CANWII_SOH,CMD_IPD,linkId, len);
+        os_sprintf(temp, "%c%c%c%c",CANWII_SOH,CMD_IPD,linkId, len);
         uart0_sendStr(temp);
         uart0_tx_buffer(pdata, len);
         uart_tx_one_char(CANWII_EOH);
