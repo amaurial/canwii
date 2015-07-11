@@ -402,7 +402,7 @@ void ICACHE_FLASH_ATTR
 sendData(char *pdata, unsigned short len,uint8_t linkId){
     if (len<=255){
         char temp[4];
-        os_sprintf(temp, "%c%c%d%c",CANWII_SOH,CMD_IPD,linkId, len);
+        os_sprintf(temp, "%c%c%c%c",CANWII_SOH,CMD_IPD,linkId, len);
         //uart0_sendStr(temp);
         uart0_tx_buffer(temp, 4);
         uart0_tx_buffer(pdata, len);
@@ -1551,47 +1551,34 @@ at_setupCmdCipmuxEsp(uint8_t mux)
 static void ICACHE_FLASH_ATTR
 at_tcpserver_discon_cb(void *arg)
 {
-  struct espconn *pespconn = (struct espconn *) arg;
-  at_linkConType *linkTemp = (at_linkConType *) pespconn->reverse;
-  char temp[16];
+    struct espconn *pespconn = (struct espconn *) arg;
+    at_linkConType *linkTemp = (at_linkConType *) pespconn->reverse;
+    char temp[16];
 
-  os_printf("S conect C: %p\n", arg);
+    os_printf("S conect C: %p\n", arg);
 
-  linkTemp->linkEn = FALSE;
-  linkTemp->pCon = NULL;
+    linkTemp->linkEn = FALSE;
+    linkTemp->pCon = NULL;
 
-  if(at_ipMux)
-  {
-    //TODO: change the message
-    generalMSG.msgid=MSG_CLOSED;
+    generalMSG.msgid=MSG_CLIENT_DISCONNECTED;
     generalMSG.param0=linkTemp->linkId;
     sendGeneralMsg(generalMSG);
-    //os_sprintf(temp,"%d,CLOSED\n", linkTemp->linkId);
-    //uart0_sendStr(temp);
-  }
-  else
-  {
-    //TODO: change the message
-    generalMSG.msgid=MSG_CLOSED;
-    generalMSG.param0=NULLPARAM;
-    sendGeneralMsg(generalMSG);
-    //uart0_sendStr("CLOSED\n");
-  }
-  if(linkTemp->teToff == TRUE)
-  {
-    linkTemp->teToff = FALSE;
-    at_backOk;
-  }
-  at_linkNum--;
-  if (at_linkNum == 0)
-  {
-    mdState = m_unlink;
-//    uart0_sendStr("Unlink\r\n");
-    disAllFlag = false;
-  }
-  ETS_UART_INTR_ENABLE();
-  specialAtState = true;
-  at_state = at_statIdle;
+
+    if(linkTemp->teToff == TRUE)
+    {
+        linkTemp->teToff = FALSE;
+        at_backOk;
+    }
+    at_linkNum--;
+    if (at_linkNum == 0)
+    {
+        mdState = m_unlink;
+        //    uart0_sendStr("Unlink\r\n");
+        disAllFlag = false;
+    }
+    ETS_UART_INTR_ENABLE();
+    specialAtState = true;
+    at_state = at_statIdle;
 }
 
 /**
@@ -1622,23 +1609,13 @@ at_tcpserver_recon_cb(void *arg, sint8 errType)
     mdState = m_unlink;
   }
 
-  if(at_ipMux)
-  {
-    //TODO: change the message
+
     generalMSG.msgid=MSG_CONNECT;
     generalMSG.param0=linkTemp->linkId;
     //sendGeneralMsg(generalMSG);
     //os_sprintf(temp, "%d,CONNECT\n", linkTemp->linkId);
     //uart0_sendStr(temp);
-  }
-  else
-  {
-    //TODO: change the message
-    generalMSG.msgid=MSG_CONNECT;
-    generalMSG.param0=NULLPARAM;
-    //sendGeneralMsg(generalMSG);
-    //uart0_sendStr("CONNECT\n");
-  }
+
   disAllFlag = false;
   if(linkTemp->teToff == TRUE)
   {
@@ -1665,6 +1642,7 @@ at_tcpserver_listen(void *arg)
   os_printf("get tcpClient:\n");
   for(i=0;i<at_linkMax;i++)
   {
+    //get the first linkid available
     if(pLink[i].linkEn == FALSE)
     {
       pLink[i].linkEn = TRUE;
@@ -1687,22 +1665,22 @@ at_tcpserver_listen(void *arg)
   espconn_regist_reconcb(pespconn, at_tcpserver_recon_cb);
   espconn_regist_disconcb(pespconn, at_tcpserver_discon_cb);
   espconn_regist_sentcb(pespconn, at_tcpclient_sent_cb);///////
-  if(at_ipMux)
-  {
+  //if(at_ipMux)
+  //{
 
-    generalMSG.msgid=MSG_CONNECT;
+    generalMSG.msgid=MSG_CLIENT_CONNECTED;
     generalMSG.param0=i;
-    //sendGeneralMsg(generalMSG);
+    sendGeneralMsg(generalMSG);
     //os_sprintf(temp, "%d,CONNECT\n", i);
     //uart0_sendStr(temp);
-  }
-  else
-  {
-    generalMSG.msgid=MSG_CONNECT;
-    generalMSG.param0=NULLPARAM;
+  //}
+  //else
+  //{
+    //generalMSG.msgid=MSG_CONNECT_CLIENT_CONNECTED;
+    //generalMSG.param0=i;
     //sendGeneralMsg(generalMSG);
     //uart0_sendStr("CONNECT\n");
-  }
+  //}
 }
 
 ///**

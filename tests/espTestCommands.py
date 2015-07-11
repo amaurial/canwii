@@ -10,6 +10,8 @@ parser.add_option("-b", "--binary", action="store_true", dest="binary", default=
                   help="Print strings in binary", metavar="BINARY")
 parser.add_option("-l", "--listen", action="store_true", dest="listen", default=False,
                   help="Just listen the port", metavar="LISTEN")
+parser.add_option("-s", "--server", action="store_true", dest="server", default=False,
+                  help="Emulate the JMRI", metavar="SERVER")
 #parser.add_option("-q", "--quiet",
 #                  action="store_false", dest="verbose", default=True,
 #                  help="don't print status messages to stdout")
@@ -177,6 +179,9 @@ def checkReceived(data):
     if (temp.find((CANWII_ERR))>=0):
         print("Found ERR\n")
         return 1
+    if (temp.find("\n")>=0):
+        print("Found \\n\n")
+        return 0
     #print("Not found OK\n")
     return -1
 
@@ -486,6 +491,24 @@ if ser.isOpen():
                         print("read data ascii: " , response.decode('ascii'),end='\n')
                         if options.binary:
                             print("read data binary: " , response,end='\n')
+                else:
+                    print ("Reopening Serial Port.\n")
+                    reopenSerial()
+        if options.server:
+            print("Acting as server\n")
+            while True:
+                if ser.isOpen():
+                    response=ser.read(255)
+                    if len(response) >0 :
+                        print("read data ascii: " , response.decode('ascii'),end='\n')
+                        if options.binary:
+                            print("read data binary: " , response,end='\n')
+
+                        pkconn= CANWII_SOH + CANWII_ERR + "220" + CANWII_EOH
+                        #print("pkconn: " , pkconn,end='\n')
+                        if pkconn in response.decode('ascii') :
+                            print("client connected. sending version")
+                            resp=sendCommand(CANWII_SOH + CMD_CIPSEND +"=0" + "VN2.0\n" + CANWII_EOH)
                 else:
                     print ("Reopening Serial Port.")
                     reopenSerial()

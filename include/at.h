@@ -92,7 +92,7 @@
 #define RSP_BUSY_SENDING 0xAF
 
 
-#define TCP_SERVER_TIMEOUT 120//seconds
+#define TCP_SERVER_TIMEOUT 60000//seconds
 
 
 #define at_linkMax 5
@@ -153,7 +153,7 @@ typedef struct
 #define NULLPARAM 255
 
 typedef enum{
-    MSG_CONNECT,
+    MSG_CONNECT=0,
     MSG_SEND,
     MSG_CLOSED,
     MSG_DNS_FAIL,
@@ -174,7 +174,9 @@ typedef enum{
     MSG_NO_CHANGE,
     MSG_TCP_SERVER_FAIL,
     MSG_FAIL,
-    MSG_NOAP
+    MSG_NOAP,
+    MSG_CLIENT_CONNECTED,
+    MSG_CLIENT_DISCONNECTED
 }enum_msgType;
 
 
