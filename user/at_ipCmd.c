@@ -1303,6 +1303,9 @@ at_setupCmdCipsend(uint8_t id, char *pPara)
     sendingID = atoi(pPara);
     if(sendingID >= at_linkMax)
     {
+      generalMSG.msgid=MSG_LINK_SET_FAIL;
+      generalMSG.param0=pLink[sendingID].linkId;
+      sendGeneralMsg(generalMSG);
       at_backError;
       return;
     }
@@ -1317,6 +1320,7 @@ at_setupCmdCipsend(uint8_t id, char *pPara)
     generalMSG.msgid=MSG_LINK_SET_FAIL;
     generalMSG.param0=pLink[sendingID].linkId;
     sendGeneralMsg(generalMSG);
+    at_backError;
     return;
   }
 
@@ -1337,10 +1341,12 @@ at_setupCmdCipsend(uint8_t id, char *pPara)
     generalMSG.msgid=MSG_TOO_LONG;
     generalMSG.param0=at_sendLen;
     sendGeneralMsg(generalMSG);
+    at_backError;
     return;
   }
     //send data
     ipSendData(temp,sendingID,at_sendLen);
+    at_backOk;
     at_state = at_statIdle;
 }
 
