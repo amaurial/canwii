@@ -1345,8 +1345,8 @@ at_setupCmdCipsend(uint8_t id, char *pPara)
     return;
   }
     //send data
-    ipSendData(temp,sendingID,at_sendLen);
     at_backOk;
+    ipSendData(temp,sendingID,at_sendLen);
     at_state = at_statIdle;
 }
 
@@ -1421,7 +1421,6 @@ at_ipDataTransparent(void *arg)
 	os_timer_disarm(&at_delayCheck);
 	if((at_tranLen == 3) && (os_memcmp(at_dataLine, "+++", 3) == 0))
 	{
-
 		specialAtState = TRUE;
         at_state = at_statIdle;
 		return;
