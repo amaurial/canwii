@@ -1,4 +1,4 @@
-/* 
+/*
  * File	: uart.c
  * This file is part of Espressif's AT+ command set program.
  * Copyright (C) 2013 - 2016, Espressif Systems
@@ -120,6 +120,7 @@ uart_tx_one_char(uint8 uart, uint8 TxChar)
 LOCAL void ICACHE_FLASH_ATTR
 uart1_write_char(char c)
 {
+/*
   if (c == '\n')
   {
     //uart_tx_one_char(UART1, '\r');
@@ -131,7 +132,8 @@ uart1_write_char(char c)
   else
   {
     uart_tx_one_char(UART1, c);
-  }
+  }*/
+  uart_tx_one_char(UART1, c);
 }
 /******************************************************************************
  * FunctionName : uart0_tx_buffer
@@ -150,6 +152,7 @@ uart0_tx_buffer(uint8 *buf, uint16 len)
   {
     //avoiding sending \r
     c=buf[i];
+    /*
     if (buf[i]=='\r') {
         if (i<len){
             if (buf[i+1]=='\n'){
@@ -157,7 +160,7 @@ uart0_tx_buffer(uint8 *buf, uint16 len)
                 i++;
             }
         }
-    }
+    }*/
     uart_tx_one_char(UART0, c);
   }
 }
