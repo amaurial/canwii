@@ -402,7 +402,7 @@ void ICACHE_FLASH_ATTR
 sendData(char *pdata, unsigned short len,uint8_t linkId){
     if (len<=255){
         char temp[4];
-        os_sprintf(temp, "%c%c%c%c",CANWII_SOH,CMD_IPD,linkId, len);
+        os_sprintf(temp, "%c%c%d%c",CANWII_SOH,CMD_IPD,linkId, len);
         //uart0_sendStr(temp);
         uart0_tx_buffer(temp, 4);
         uart0_tx_buffer(pdata, len);

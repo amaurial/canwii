@@ -92,7 +92,7 @@
 #define RSP_BUSY_SENDING 0xAF
 
 
-#define TCP_SERVER_TIMEOUT 60000//seconds
+#define TCP_SERVER_TIMEOUT 600//0 to 7200 seconds
 
 
 #define at_linkMax 5
