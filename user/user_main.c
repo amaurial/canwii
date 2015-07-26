@@ -24,48 +24,46 @@
 extern uint8_t at_wifiMode;
 extern void user_esp_platform_load_param(void *param, uint16 len);
 
-
 void user_init(void)
 {
-  esp_StoreType tempUart;
 
   uart_init(BIT_RATE_115200, BIT_RATE_115200);
   #ifdef DEBUG
     uart0_sendStr("INIT\n");
   #endif // DEBUG
-  user_esp_platform_load_param((uint32 *)&tempUart, sizeof(esp_StoreType));
+  user_esp_platform_load_param((uint32 *)&espParam, sizeof(esp_StoreType));
   at_wifiMode = wifi_get_opmode();
 
   //create the server
-  if (tempUart.state==1){
+  if (espParam.state==1){
     #ifdef DEBUG
         char temp[255];
         os_sprintf(temp, "merg command: state-%d saved-%d ssid-%s passwd-%s cmdid-%d cmdsubid-%d ssidlen-%d passwdlen-%d cwmode-%d cwmux-%d port-%d wpa-%d channel-%d dhcpmode-%d dhcpen-%d servermode-%d timeout-%d\n",
-        tempUart.state,
-        tempUart.saved,
-        tempUart.ssid,
-        tempUart.passwd,
-        tempUart.cmdid,
-        tempUart.cmdsubid,
-        tempUart.ssidlen,
-        tempUart.passwdlen,
-        tempUart.cwmode,
-        tempUart.cwmux,
-        tempUart.port,
-        tempUart.wpa,
-        tempUart.channel,
-        tempUart.dhcp_mode,
-        tempUart.dhcp_enable,
-        tempUart.server_mode,
-        tempUart.timeout);
+        espParam.state,
+        espParam.saved,
+        espParam.ssid,
+        espParam.passwd,
+        espParam.cmdid,
+        espParam.cmdsubid,
+        espParam.ssidlen,
+        espParam.passwdlen,
+        espParam.cwmode,
+        espParam.cwmux,
+        espParam.port,
+        espParam.wpa,
+        espParam.channel,
+        espParam.dhcp_mode,
+        espParam.dhcp_enable,
+        espParam.server_mode,
+        espParam.timeout);
         uart0_sendStr(temp);
         uart0_sendStr("STARTING SAVED STATE\n");
     #endif //DEBUG
 
-    setupServer(&tempUart);
-    tempUart.state==1;
-    tempUart.saved==0;
-    //user_esp_platform_save_param((uint32 *)&tempUart, sizeof(esp_StoreType));
+    setupServer(&espParam);
+    espParam.state==1;
+    espParam.saved==0;
+    //user_esp_platform_save_param((uint32 *)&espParam, sizeof(esp_StoreType));
   }
   at_backOk;
 

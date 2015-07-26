@@ -1656,8 +1656,16 @@ at_tcpserver_listen(void *arg)
   }
   if(i>=5)
   {
+    #ifdef DEBUG
+        uart0_sendStr("at_tcpserver_listen linkid > 5\n");
+    #endif // DEBUG
     return;
   }
+
+  #ifdef DEBUG
+        uart0_sendStr("at_tcpserver_listen register callback functions\n");
+    #endif // DEBUG
+
   pLink[i].teToff = FALSE;
   pLink[i].linkId = i;
   pLink[i].teType = teServer;
@@ -1796,19 +1804,31 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port)
   tport=port;
   if(at_ipMux == FALSE)
   {
+    #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp wrong at_ipMux\n");
+    #endif // DEBUG
     return 1;
   }
 
   if (mode>1 || mode <0){
+    #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp wrong mode\n");
+    #endif // DEBUG
     return 1;
   }
 
   if (port>0xff){
+    #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp wrong port\n");
+    #endif // DEBUG
     return 1;
   }
 
   if(mode == 0 && tport<=0)
   {
+    #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp wrong mode/port\n");
+    #endif // DEBUG
     return 1;
   }
   else if(mode == 1)
@@ -1817,29 +1837,63 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port)
       tport = 30;
     }
   }
+  /*
   else
   {
+    #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp mode wrong\n");
+    #endif // DEBUG
     return 1;
-  }
-
+  }*/
+/*
   if(mode == serverEn)
   {
+    #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp no change. force reset maybe\n");
+    #endif // DEBUG
+    espconn_disconnect();
     generalMSG.msgid=MSG_NO_CHANGE;
     generalMSG.param0=NULLPARAM;
     sendGeneralMsg(generalMSG);
     return 0;
   }
+   */
+   if(mode == serverEn){
+        #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp delete previous tcp server\n");
+        #endif // DEBUG
+        int i;
+        for(i=0;i<at_linkMax;i++)
+          {
+            espconn_delete(pLink[i].pCon);
+            pLink[i].linkEn=FALSE;
+            pLink[i].teToff = TRUE;
+            pLink[i].pCon = NULL;
+          }
+        at_linkNum=0;
+        mdState = m_unlink;
+        disAllFlag = false;
+   }
 
   if(mode==1)
   {
+    #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp create a new tcp server\n");
+    #endif // DEBUG
     pTcpServer = (struct espconn *)os_zalloc(sizeof(struct espconn));
     if (pTcpServer == NULL)
     {
       generalMSG.msgid=MSG_TCP_SERVER_FAIL;
       generalMSG.param0=NULLPARAM;
       sendGeneralMsg(generalMSG);
+      #ifdef DEBUG
+        uart0_sendStr("at_setupCmdCipserverEsp failed to set tcp server\n");
+    #endif // DEBUG
       return 1;
     }
+    //force a disconnect.
+
+
     pTcpServer->type = ESPCONN_TCP;
     pTcpServer->state = ESPCONN_NONE;
     pTcpServer->proto.tcp = (esp_tcp *)os_zalloc(sizeof(esp_tcp));
@@ -1847,7 +1901,6 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port)
     espconn_regist_connectcb(pTcpServer, at_tcpserver_listen);
     espconn_accept(pTcpServer);
     espconn_regist_time(pTcpServer, server_timeover, 0);
-
   }
   else
   {
@@ -1856,6 +1909,11 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port)
     generalMSG.msgid=MSG_RESTART;
     generalMSG.param0=NULLPARAM;
     sendGeneralMsg(generalMSG);
+    #ifdef DEBUG
+        char temp[50];
+        os_sprintf(temp,"at_setupCmdCipserverEsp mode not expected:%d\n",mode);
+        uart0_sendStr(temp);
+    #endif // DEBUG
     //uart0_sendStr("we must restart\n");
     return 1;
   }

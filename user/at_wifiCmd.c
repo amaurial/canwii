@@ -460,23 +460,38 @@ at_setupCmdCwsapEsp(struct softap_config *apConfig,uint8_t passwdlen)
 
     if(at_wifiMode == STATION_MODE)
     {
+        #ifdef DEBUG
+            uart0_sendStr("at_setupCmdCwsapEsp wifmode in STATION_MODE\n");
+        #endif // DEBUG
         return 1;
     }
 
     if(apConfig->ssid_len < 1 || passwdlen==-1)
     {
+        #ifdef DEBUG
+            uart0_sendStr("at_setupCmdCwsapEsp invalid psswd len\n");
+        #endif // DEBUG
         return 1;
     }
     if(apConfig->channel<1 || apConfig->channel>13)
     {
+        #ifdef DEBUG
+            uart0_sendStr("at_setupCmdCwsapEsp invalid channel\n");
+        #endif // DEBUG
         return 1;
     }
     if(apConfig->authmode >= 5)
     {
+        #ifdef DEBUG
+            uart0_sendStr("at_setupCmdCwsapEsp authmode\n");
+        #endif // DEBUG
         return 1;
     }
     if((apConfig->authmode != 0)&&(passwdlen < 5))
     {
+        #ifdef DEBUG
+            uart0_sendStr("at_setupCmdCwsapEsp password len should be bigger than 5\n");
+        #endif // DEBUG
         return 1;
     }
     //ETS_UART_INTR_DISABLE();
