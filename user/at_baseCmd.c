@@ -97,8 +97,8 @@ at_exeCmdGmr(uint8_t id)
 
 //#define ESP_PARAM_START_SEC   0x3C
 #define ESP_PARAM_START_SEC   0x3D
-#define ESP_MEM_POS1 0xff00
-#define ESP_MEM_POS2 0xff00
+#define ESP_MEM_POS1 0x3D000//0xff00
+#define ESP_MEM_POS2 0x3D000//0xff00
 #define ESP_PARAM_SAVE_0    1
 #define ESP_PARAM_SAVE_1    2
 #define ESP_PARAM_FLAG      3
@@ -113,6 +113,28 @@ struct esp_platform_sec_flag_param {
  * Parameters   : param--the parame point which write the flash
  * Returns      : none
 *******************************************************************************/
+void ICACHE_FLASH_ATTR
+user_esp_platform_load_param(void *param, uint16 len)
+{
+
+        #ifdef DEBUG
+            uart0_sendStr("reading on sector 0\n");
+        #endif // DEBUG
+        SpiFlashOpResult ret;
+        ret=spi_flash_read(ESP_PARAM_START_SEC + ESP_MEM_POS1,(uint32 *)param, len);
+        if (ret!=SPI_FLASH_RESULT_OK){
+            #ifdef DEBUG
+                uart0_sendStr("ERROR READING config.\n");
+                if (ret==SPI_FLASH_RESULT_TIMEOUT){
+                    uart0_sendStr("ERROR READING TIMEOUT.\n");
+                }
+                else{
+                    uart0_sendStr("ERROR READING FAILED.\n");
+                }
+            #endif // DEBUG
+        }
+}
+/*
 void ICACHE_FLASH_ATTR
 user_esp_platform_load_param(void *param, uint16 len)
 {
@@ -152,7 +174,7 @@ user_esp_platform_load_param(void *param, uint16 len)
         }
     }
 }
-
+*/
 /******************************************************************************
  * FunctionName : user_esp_platform_save_param
  * Description  : toggle save param to two sector by flag value,
@@ -160,6 +182,52 @@ user_esp_platform_load_param(void *param, uint16 len)
  * Parameters   : param -- the parame point which write the flash
  * Returns      : none
 *******************************************************************************/
+void ICACHE_FLASH_ATTR
+user_esp_platform_save_param(void *param, uint16 len)
+{
+        #ifdef DEBUG
+            uart0_sendStr("saving on sector 0\n");
+        #endif // DEBUG
+        SpiFlashOpResult ret;
+        spi_flash_erase_sector(ESP_PARAM_START_SEC);
+        ret=spi_flash_write(ESP_PARAM_START_SEC + ESP_MEM_POS1,(uint32 *)param, len);
+        if (ret!=SPI_FLASH_RESULT_OK){
+            #ifdef DEBUG
+                uart0_sendStr("ERROR WRITING config.\n");
+
+                if (ret==SPI_FLASH_RESULT_TIMEOUT){
+                    uart0_sendStr("ERROR WRITTING TIMEOUT.\n");
+                }
+                else{
+                    uart0_sendStr("ERROR WRITTING FAILED.\n");
+                }
+
+
+                char temp[255];
+                esp_StoreType *esptemp=(esp_StoreType *)param;
+                os_sprintf(temp, "merg command: state-%d saved-%d ssid-%s passwd-%s cmdid-%d cmdsubid-%d ssidlen-%d passwdlen-%d cwmode-%d cwmux-%d port-%d wpa-%d channel-%d dhcpmode-%d dhcpen-%d servermode-%d timeout-%d\n",
+                esptemp->state,
+                esptemp->saved,
+                esptemp->ssid,
+                esptemp->passwd,
+                esptemp->cmdid,
+                esptemp->cmdsubid,
+                esptemp->ssidlen,
+                esptemp->passwdlen,
+                esptemp->cwmode,
+                esptemp->cwmux,
+                esptemp->port,
+                esptemp->wpa,
+                esptemp->channel,
+                esptemp->dhcp_mode,
+                esptemp->dhcp_enable,
+                esptemp->server_mode,
+                esptemp->timeout);
+                uart0_sendStr(temp);
+            #endif // DEBUG
+        }
+}
+/*
 void ICACHE_FLASH_ATTR
 user_esp_platform_save_param(void *param, uint16 len)
 {
@@ -223,7 +291,7 @@ user_esp_platform_save_param(void *param, uint16 len)
         }
     }
 }
-
+*/
 void ICACHE_FLASH_ATTR
 at_setupCmdGslp(uint8_t id, char *pPara)
 {

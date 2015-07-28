@@ -125,9 +125,15 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
   struct ip_info pTempIp;
   char temp[64];
   uint8 bssid[6];
-
+    #ifdef DEBUG
+       char log[50];
+       uart0_sendStr("showing IP\n");
+    #endif // DEBUG
   if((at_wifiMode == SOFTAP_MODE)||(at_wifiMode == STATIONAP_MODE))
   {
+    #ifdef DEBUG
+       uart0_sendStr("getting the ip  number soft ap stationap mode\n");
+    #endif // DEBUG
     wifi_get_ip_info(0x01, &pTempIp);
     wifi_get_macaddr(SOFTAP_IF, bssid);
      #ifdef VERBOSE
@@ -146,17 +152,21 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
         uart0_sendStr(temp);
     #else
         //<SOH><CMD><P1><IP><P2><MAC><EOH>
-
+        #ifdef DEBUG
+            os_sprintf(log, "\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
+            uart0_sendStr(log);
+        #endif // DEBUG
         os_sprintf(temp, "%c%c%d%d.%d.%d.%s%c",CANWII_SOH, at_fun[id].at_cmdCode,
                     1,IP2STR(&pTempIp.ip),2,MAC2STR(bssid),CANWII_EOH);
         uart0_sendStr(temp);
     #endif // VERBOSE
 
-
-//    mdState = m_gotip; /////////
   }
   if((at_wifiMode == STATION_MODE)||(at_wifiMode == STATIONAP_MODE))
   {
+    #ifdef DEBUG
+       uart0_sendStr("getting the ip  number station mode stationap mode\n");
+    #endif // DEBUG
     wifi_get_ip_info(0x00, &pTempIp);
     wifi_get_macaddr(STATION_IF, bssid);
 
@@ -176,6 +186,10 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
                    MAC2STR(bssid));
         uart0_sendStr(temp);
     #else
+        #ifdef DEBUG
+            os_sprintf(log, "\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
+            uart0_sendStr(log);
+        #endif // DEBUG
         os_sprintf(temp, "%c%c%d%d.%d.%d.%s%c\n",CANWII_SOH, at_fun[id].at_cmdCode,
                     1,IP2STR(&pTempIp.ip),2,MAC2STR(bssid),CANWII_EOH);
         uart0_sendStr(temp);

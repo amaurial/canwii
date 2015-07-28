@@ -25,7 +25,7 @@
 #define at_recvTaskQueueLen    64
 
 #define CMD_BUFFER_SIZE 128
-#define DEBUG 1
+//#define DEBUG 1
 //#define VERBOSE 1
 
 
@@ -193,8 +193,7 @@ typedef struct{
 
 }structNodeParam;
 
-//global parameters
-esp_StoreType espParam;
+
 
 void at_init(void);
 void at_cmdProcess(uint8_t *pAtRcvData);
