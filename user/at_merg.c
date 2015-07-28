@@ -57,11 +57,11 @@ at_setupMerg(uint8_t id,char *pPara )
         return;
     }
     setupAp(&esp);
-    os_delay_us(10000);
+    //os_delay_us(10000);
     setupServer(&esp);
-    os_delay_us(10000);
+    //os_delay_us(10000);
     at_backOk;
-    system_restart();
+    //system_restart();
 }
 
 void ICACHE_FLASH_ATTR
