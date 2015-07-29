@@ -124,6 +124,7 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
 {
   struct ip_info pTempIp;
   char temp[64];
+  char ip[15];
 
   uint8 bssid[6];
     #ifdef DEBUG
@@ -157,8 +158,8 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
             os_sprintf(log, "\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
             uart0_sendStr(log);
         #endif // DEBUG
-        os_sprintf(temp, "%c%c%d.%d.%d.%d,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,
-                    IP2STR(&pTempIp.ip),MAC2STR(bssid),CANWII_EOH);
+        os_sprintf(ip, "%d.%d.%d.%d",IP2STR(&pTempIp.ip));
+        os_sprintf(temp, "%c%c%s,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,ip,MAC2STR(bssid),CANWII_EOH);
         uart0_sendStr(temp);
     #endif // VERBOSE
 

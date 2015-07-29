@@ -67,7 +67,9 @@ void user_init(void)
 
   //create the server
   if (espParam.state==1){
-    uart0_sendStr("STARTING SAVED STATE\n");
+    #ifdef DEBUG
+        uart0_sendStr("STARTING SAVED STATE\n");
+    #endif // DEBUG
     setupServer(&espParam);
     espParam.state==1;
     espParam.saved==0;

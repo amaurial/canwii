@@ -45,17 +45,6 @@ at_setupMerg(uint8_t id,char *pPara )
     uart0_sendStr(temp);
     #endif // DEBUG
 
-    #ifdef DEBUG
-            uart0_sendStr("setting mode\n");
-    #endif // DEBUG
-    //set mode
-    if (at_setupCmdCwmodeEsp(esp.cwmode)!=0){
-        #ifdef DEBUG
-                uart0_sendStr("failed to set mode\n");
-        #endif // DEBUG
-        at_backError;
-        return;
-    }
     setupAp(&esp);
     //os_delay_us(10000);
     setupServer(&esp);
@@ -91,12 +80,6 @@ setupAp(esp_StoreType *espdata ){
         return;
     }
 
-    espdata->state=1;
-    espdata->saved=1;
-
-    //user_esp_platform_save_param((uint32 *)espdata, sizeof(esp_StoreType));
-
-
     //set ssid,passwd
     #ifdef DEBUG
             uart0_sendStr("setting ssi\n");
@@ -131,13 +114,6 @@ setupAp(esp_StoreType *espdata ){
     apConfig.channel=espdata->channel;
     apConfig.authmode=espdata->wpa;
 
-    #ifdef DEBUG
-            char temp[50];
-            os_sprintf(temp,"Saving parameters to memory  size:%d\n",sizeof(esp_StoreType));
-            uart0_sendStr(temp);
-    #endif // DEBUG
-
-    saveMergParams(espdata);
 
     if (at_setupCmdCwsapEsp(&apConfig,espdata->passwdlen)!=0){
         #ifdef DEBUG
@@ -149,6 +125,17 @@ setupAp(esp_StoreType *espdata ){
     #ifdef DEBUG
             uart0_sendStr("ssi set\n");
     #endif // DEBUG
+
+
+    #ifdef DEBUG
+            char temp[50];
+            os_sprintf(temp,"Saving parameters to memory  size:%d\n",sizeof(esp_StoreType));
+            uart0_sendStr(temp);
+    #endif // DEBUG
+
+    espdata->state=1;
+    espdata->saved=1;
+    saveMergParams(espdata);
 
     //system_restart();
 
@@ -184,7 +171,7 @@ setupServer(esp_StoreType *espdata ){
     #endif // DEBUG
     //print the ip
     #ifdef DEBUG
-            uart0_sendStr("printing ip as status\n");
+            uart0_sendStr("printing ip and status\n");
     #endif // DEBUG
     at_exeCmdCifsr(CMD_CIFSR);
     //print status
@@ -194,6 +181,7 @@ setupServer(esp_StoreType *espdata ){
 void saveMergParams(esp_StoreType *espdata){
 
     esp_StoreType temp;
+    /*
     temp.baud=0;
     temp.channel=0;
     temp.cmdid=0;
@@ -214,7 +202,7 @@ void saveMergParams(esp_StoreType *espdata){
     temp.timeout=0;
     temp.wpa=0;
     user_esp_platform_save_param(&temp, sizeof(esp_StoreType));
-
+    */
     #ifdef DEBUG
     char tempesp[255];
     os_sprintf(tempesp, "merg command: ssid-\"%s\" passwd-\"%s\" cmdid-%d cmdsubid-%d ssidlen-%d passwdlen-%d cwmode-%d cwmux-%d port-%d wpa-%d channel-%d dhcpmode-%d dhcpen-%d servermode-%d timeout-%d state-%d\n",
