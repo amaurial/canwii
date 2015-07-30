@@ -75,10 +75,12 @@ at_setupCmdCwmode(uint8_t id, char *pPara)
 uint8_t ICACHE_FLASH_ATTR
 at_setupCmdCwmodeEsp(uint8_t mode)
 {
+/*
   if(mode == at_wifiMode)
   {
     return 0;
   }
+  */
   if((mode >= 1) && (mode <= 3))
   {
     ETS_UART_INTR_DISABLE();
@@ -564,7 +566,7 @@ at_setupCmdCwdhcpEsp(uint8_t mode, uint8_t opt)
     switch (mode)
 	{
 	case 0:
-	  if(opt)
+	  if(opt==0)
 	  {
 	  	ret = wifi_softap_dhcps_start();
 	  }
@@ -575,7 +577,7 @@ at_setupCmdCwdhcpEsp(uint8_t mode, uint8_t opt)
 		break;
 
 	case 1:
-		if(opt)
+		if(opt==0)
 	  {
 	  	ret = wifi_station_dhcpc_start();
 	  }
@@ -586,7 +588,7 @@ at_setupCmdCwdhcpEsp(uint8_t mode, uint8_t opt)
 		break;
 
 	case 2:
-		if(opt)
+		if(opt==0)
 	  {
 	  	ret = wifi_softap_dhcps_start();
 	  	ret |= wifi_station_dhcpc_start();

@@ -45,16 +45,23 @@ at_setupMerg(uint8_t id,char *pPara )
     uart0_sendStr(temp);
     #endif // DEBUG
 
-    setupAp(&esp);
+    setupAp(&esp,true);
     //os_delay_us(10000);
     setupServer(&esp);
     //os_delay_us(10000);
     at_backOk;
     //system_restart();
+    //print the ip
+    #ifdef DEBUG
+            uart0_sendStr("printing ip and status\n");
+    #endif // DEBUG
+    at_exeCmdCifsr(CMD_CIFSR);
+    //print status
+    at_exeCmdCipstatus(CMD_CIPSTATUS);
 }
 
 void ICACHE_FLASH_ATTR
-setupAp(esp_StoreType *espdata ){
+setupAp(esp_StoreType *espdata ,bool save){
 
     #ifdef DEBUG
             uart0_sendStr("setting mode\n");
@@ -145,7 +152,10 @@ setupAp(esp_StoreType *espdata ){
 
     espdata->state=1;
     espdata->saved=1;
-    saveMergParams(espdata);
+    if (save){
+        saveMergParams(espdata);
+    }
+
 
     //system_restart();
 
@@ -179,13 +189,7 @@ setupServer(esp_StoreType *espdata ){
     #ifdef DEBUG
         uart0_sendStr("server mode OK\n");
     #endif // DEBUG
-    //print the ip
-    #ifdef DEBUG
-            uart0_sendStr("printing ip and status\n");
-    #endif // DEBUG
-    at_exeCmdCifsr(CMD_CIFSR);
-    //print status
-    at_exeCmdCipstatus(CMD_CIPSTATUS);
+
 }
 
 void saveMergParams(esp_StoreType *espdata){

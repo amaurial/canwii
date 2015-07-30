@@ -57,6 +57,7 @@ void at_testCmdGeneric(uint8_t id);
 
 void at_setupCmdCifsr(uint8_t id, char *pPara);
 void at_exeCmdCifsr(uint8_t id);
+void getShowIP_MAC(uint8_t p_ip_param,uint8_t p_mac_param,bool msg,uint8_t id);
 
 void at_exeCmdCipstatus(uint8_t id);
 

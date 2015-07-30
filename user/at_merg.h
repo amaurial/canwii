@@ -12,6 +12,6 @@
 
 void at_setupMerg(uint8_t id,char *pPara );
 void setupServer(esp_StoreType *espdata );
-void setupAp(esp_StoreType *espdata);
+void setupAp(esp_StoreType *espdata,bool save);
 void saveMergParams(esp_StoreType *espdata);
 #endif

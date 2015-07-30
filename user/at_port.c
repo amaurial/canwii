@@ -296,6 +296,7 @@ void ICACHE_FLASH_ATTR
 at_init(void)
 {
   //set the tasks for the OS
+  at_state = at_statIdle;
   system_os_task(at_recvTask, at_recvTaskPrio, at_recvTaskQueue, at_recvTaskQueueLen);
   system_os_task(at_procTask, at_procTaskPrio, at_procTaskQueue, at_procTaskQueueLen);
 }

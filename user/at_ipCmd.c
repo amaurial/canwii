@@ -122,24 +122,26 @@ at_setupCmdCifsr(uint8_t id, char *pPara)
 void ICACHE_FLASH_ATTR
 at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
 {
+/*
   struct ip_info pTempIp;
   char temp[64];
   char ip[15];
   char mac[24];
-
   uint8 bssid[6];
+  */
     #ifdef DEBUG
-       char log[50];
        uart0_sendStr("showing IP\n");
     #endif // DEBUG
-  if((at_wifiMode == SOFTAP_MODE))
+  if((at_wifiMode == SOFTAP_MODE)||(at_wifiMode == STATIONAP_MODE))
   {
+        getShowIP_MAC(0x01,SOFTAP_IF,false,id);
+  /*
     #ifdef DEBUG
        uart0_sendStr("getting the ip  number soft ap stationap mode\n");
     #endif // DEBUG
     wifi_get_ip_info(0x01, &pTempIp);
     wifi_get_macaddr(SOFTAP_IF, bssid);
-    /*
+
      #ifdef VERBOSE
         os_sprintf(temp, "%s:APIP,", at_fun[id].at_cmdName);
         uart0_sendStr(temp);
@@ -157,31 +159,31 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
     #else
         //<SOH><CMD><P1><IP><P2><MAC><EOH>
         #ifdef DEBUG
-            os_sprintf(log, "\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
+            os_sprintf(log, "IP-S:\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
             uart0_sendStr(log);
-            os_sprintf(log, "MAC:%s\n",MAC2STR(bssid));
+            os_sprintf(log, "MAC:\"%d:%d:%d:%d:%d:%d\"\n",bssid[0],bssid[1],bssid[2],
+                       bssid[3],bssid[4],bssid[5]);
             uart0_sendStr(log);
         #endif // DEBUG
         os_sprintf(ip, "%d.%d.%d.%d",IP2STR(&pTempIp.ip));
-        os_sprintf(log, "%d:%d:%d:%d:%d:%d:%d",bssid[0],bssid[1],bssid[2],
+        os_sprintf(mac, "%d:%d:%d:%d:%d:%d",bssid[0],bssid[1],bssid[2],
                        bssid[3],bssid[4],bssid[5]);
 
-        os_sprintf(temp, "%c%c%s,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,ip,log,CANWII_EOH);
+        os_sprintf(temp, "%c%c%s,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,ip,mac,CANWII_EOH);
         uart0_sendStr(temp);
     #endif // VERBOSE
-    */
+*/
 
   }
   if((at_wifiMode == STATION_MODE)||(at_wifiMode == STATIONAP_MODE))
   {
+    getShowIP_MAC(0x00,STATION_IF,true,id);
+  /*
     #ifdef DEBUG
-       uart0_sendStr("getting the ip  number station mode stationap mode\n");
+       uart0_sendStr("\ngetting the ip station mode stationap mode\n");
     #endif // DEBUG
     wifi_get_ip_info(0x00, &pTempIp);
     wifi_get_macaddr(STATION_IF, bssid);
-
-  }
-
     #ifdef VERBOSE
         os_sprintf(temp, "%s:STAIP,", at_fun[id].at_cmdName);
         uart0_sendStr(temp);
@@ -199,7 +201,7 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
         uart0_sendStr(temp);
     #else
         #ifdef DEBUG
-            os_sprintf(log, "IP:\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
+            os_sprintf(log, "IP ST:\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
             uart0_sendStr(log);
             os_sprintf(log, "MAC:\"%d:%d:%d:%d:%d:%d\"\n",bssid[0],bssid[1],bssid[2],
                        bssid[3],bssid[4],bssid[5]);
@@ -211,9 +213,92 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
         os_sprintf(ip, "%d.%d.%d.%d",IP2STR(&pTempIp.ip));
         os_sprintf(temp, "%c%c%s,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,ip,mac,CANWII_EOH);
     #endif // VERBOSE
+    */
+  }
 
   mdState = m_gotip;
   at_backOk;
+}
+
+void ICACHE_FLASH_ATTR
+ getShowIP_MAC(uint8_t p_ip_param,uint8_t p_mac_param,bool msg,uint8_t id){
+
+    struct ip_info pTempIp;
+    char temp[64];
+    char ip[15];
+    char mac[24];
+    uint8 bssid[6];
+
+    #ifdef DEBUG
+        char log[50];
+       uart0_sendStr("\ngetting the ip and mac\n");
+    #endif // DEBUG
+    wifi_get_ip_info(p_ip_param, &pTempIp);
+    wifi_get_macaddr(p_mac_param, bssid);
+    #ifdef VERBOSE
+        if(msg)
+        {
+            os_sprintf(temp, "%s:STAIP,", at_fun[id].at_cmdName);
+            uart0_sendStr(temp);
+
+            os_sprintf(temp, "\"%d.%d.%d.%d\"\n",
+                       IP2STR(&pTempIp.ip));
+            uart0_sendStr(temp);
+
+            os_sprintf(temp, "%s:STAMAC,", at_fun[id].at_cmdName);
+            uart0_sendStr(temp);
+
+
+            os_sprintf(temp, "\""MACSTR"\"\n",
+                       MAC2STR(bssid));
+            uart0_sendStr(temp);
+        }
+        else{
+            os_sprintf(temp, "%s:APIP,", at_fun[id].at_cmdName);
+            uart0_sendStr(temp);
+
+            os_sprintf(temp, "\"%d.%d.%d.%d\"\n",
+                       IP2STR(&pTempIp.ip));
+            uart0_sendStr(temp);
+
+            os_sprintf(temp, "%s:APMAC,", at_fun[id].at_cmdName);
+            uart0_sendStr(temp);
+
+            os_sprintf(temp, "\""MACSTR"\"\n%s\n",MAC2STR(bssid));
+            //os_sprintf(temp, "\""MACSTR"\"\n%s\n",bssid);
+            uart0_sendStr(temp);
+
+        }
+
+    #else
+        #ifdef DEBUG
+
+            if (msg){
+                os_sprintf(log, "IP ST:\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
+                uart0_sendStr(log);
+                os_sprintf(log, "MAC:\"%d:%d:%d:%d:%d:%d\"\n",bssid[0],bssid[1],bssid[2],
+                           bssid[3],bssid[4],bssid[5]);
+                uart0_sendStr(log);
+            }
+            else{
+                os_sprintf(log, "IP-S:\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
+                uart0_sendStr(log);
+                os_sprintf(log, "MAC:\"%d:%d:%d:%d:%d:%d\"\n",bssid[0],bssid[1],bssid[2],
+                           bssid[3],bssid[4],bssid[5]);
+                uart0_sendStr(log);
+            }
+
+        #endif // DEBUG
+        os_sprintf(mac, "%d:%d:%d:%d:%d:%d",bssid[0],bssid[1],bssid[2],
+                       bssid[3],bssid[4],bssid[5]);
+
+        os_sprintf(ip, "%d.%d.%d.%d",IP2STR(&pTempIp.ip));
+        os_sprintf(temp, "%c%c%s,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,ip,mac,CANWII_EOH);
+        uart0_sendStr(temp);
+    #endif // VERBOSE
+
+
+
 }
 
 /**
@@ -1688,6 +1773,10 @@ at_tcpserver_listen(void *arg)
   struct espconn *pespconn = (struct espconn *)arg;
   uint8_t i;
   char temp[16];
+
+  #ifdef DEBUG
+        uart0_sendStr("at_tcpserver_listen got a client\n");
+    #endif // DEBUG
 
   os_printf("get tcpClient:\n");
   for(i=0;i<at_linkMax;i++)

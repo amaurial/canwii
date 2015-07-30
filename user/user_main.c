@@ -28,7 +28,7 @@ void printEspParam(esp_StoreType *espP){
 
 #ifdef DEBUG
         char temp[255];
-        os_sprintf(temp, "merg command: state-%d saved-%d ssid-%s passwd-%s cmdid-%d cmdsubid-%d ssidlen-%d passwdlen-%d cwmode-%d cwmux-%d port-%d wpa-%d channel-%d dhcpmode-%d dhcpen-%d servermode-%d timeout-%d\n",
+        os_sprintf(temp, "esp config: state-%d saved-%d ssid-%s passwd-%s cmdid-%d cmdsubid-%d ssidlen-%d passwdlen-%d cwmode-%d cwmux-%d port-%d wpa-%d channel-%d dhcpmode-%d dhcpen-%d servermode-%d timeout-%d\n",
         espP->state,
         espP->saved,
         espP->ssid,
@@ -63,18 +63,32 @@ void user_init(void)
   user_esp_platform_load_param(&espParam, sizeof(esp_StoreType));
   at_wifiMode = wifi_get_opmode();
 
-  printEspParam(&espParam);
+  #ifdef DEBUG
+    char temp[30];
+    os_sprintf(temp, "wifi_mode: %d\n",at_wifiMode);
+    uart0_sendStr(temp);
+  #endif // DEBUG
+
+  //printEspParam(&espParam);
 
   //create the server
   if (espParam.state==1){
     #ifdef DEBUG
         uart0_sendStr("STARTING SAVED STATE\n");
     #endif // DEBUG
-    setupAp(&espParam);	
+    setupAp(&espParam,false);
+    os_delay_us(20000);
     setupServer(&espParam);
-    espParam.state==1;
-    espParam.saved==0;
-    //user_esp_platform_save_param((uint32 *)&espParam, sizeof(esp_StoreType));
+
+    //print the ip
+    #ifdef DEBUG
+            uart0_sendStr("printing ip and status\n");
+    #endif // DEBUG
+    at_exeCmdCifsr(CMD_CIFSR);
+    //print status
+    at_exeCmdCipstatus(CMD_CIPSTATUS);
+
+
   }
   at_backOk;
 
