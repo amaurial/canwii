@@ -46,18 +46,15 @@ at_setupMerg(uint8_t id,char *pPara )
     #endif // DEBUG
 
     setupAp(&esp,true);
-    //os_delay_us(10000);
     setupServer(&esp);
-    //os_delay_us(10000);
     at_backOk;
-    //system_restart();
     //print the ip
-    #ifdef DEBUG
-            uart0_sendStr("printing ip and status\n");
-    #endif // DEBUG
-    at_exeCmdCifsr(CMD_CIFSR);
+//    #ifdef DEBUG
+//            uart0_sendStr("printing ip and status\n");
+//    #endif // DEBUG
+//    at_exeCmdCifsr(CMD_CIFSR);
     //print status
-    at_exeCmdCipstatus(CMD_CIPSTATUS);
+//    at_exeCmdCipstatus(CMD_CIPSTATUS);
 }
 
 void ICACHE_FLASH_ATTR
@@ -195,7 +192,7 @@ setupServer(esp_StoreType *espdata ){
 void saveMergParams(esp_StoreType *espdata){
 
     esp_StoreType temp;
-    /*
+    
     temp.baud=0;
     temp.channel=0;
     temp.cmdid=0;
@@ -216,7 +213,7 @@ void saveMergParams(esp_StoreType *espdata){
     temp.timeout=0;
     temp.wpa=0;
     user_esp_platform_save_param(&temp, sizeof(esp_StoreType));
-    */
+    
     #ifdef DEBUG
     char tempesp[255];
     os_sprintf(tempesp, "merg command: ssid-\"%s\" passwd-\"%s\" cmdid-%d cmdsubid-%d ssidlen-%d passwdlen-%d cwmode-%d cwmux-%d port-%d wpa-%d channel-%d dhcpmode-%d dhcpen-%d servermode-%d timeout-%d state-%d\n",

@@ -69,6 +69,7 @@ void user_init(void)
     uart0_sendStr(temp);
   #endif // DEBUG
 
+    //TODO memory leak here
   //printEspParam(&espParam);
 
   //create the server
@@ -81,12 +82,12 @@ void user_init(void)
     setupServer(&espParam);
 
     //print the ip
-    #ifdef DEBUG
-            uart0_sendStr("printing ip and status\n");
-    #endif // DEBUG
-    at_exeCmdCifsr(CMD_CIFSR);
+//    #ifdef DEBUG
+//            uart0_sendStr("printing ip and status\n");
+//    #endif // DEBUG
+//    at_exeCmdCifsr(CMD_CIFSR);
     //print status
-    at_exeCmdCipstatus(CMD_CIPSTATUS);
+//    at_exeCmdCipstatus(CMD_CIPSTATUS);
 
 
   }
