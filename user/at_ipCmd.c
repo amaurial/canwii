@@ -43,7 +43,7 @@ static BOOL serverEn = FALSE;
 static at_linkNum = 0;
 
 
-static uint16_t server_timeover = 180;
+static uint16_t server_timeover = TCP_SERVER_TIMEOUT;
 static struct espconn *pTcpServer;
 static struct espconn *pUdpServer;
 
@@ -125,19 +125,21 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
   struct ip_info pTempIp;
   char temp[64];
   char ip[15];
+  char mac[24];
 
   uint8 bssid[6];
     #ifdef DEBUG
        char log[50];
        uart0_sendStr("showing IP\n");
     #endif // DEBUG
-  if((at_wifiMode == SOFTAP_MODE)||(at_wifiMode == STATIONAP_MODE))
+  if((at_wifiMode == SOFTAP_MODE))
   {
     #ifdef DEBUG
        uart0_sendStr("getting the ip  number soft ap stationap mode\n");
     #endif // DEBUG
     wifi_get_ip_info(0x01, &pTempIp);
     wifi_get_macaddr(SOFTAP_IF, bssid);
+    /*
      #ifdef VERBOSE
         os_sprintf(temp, "%s:APIP,", at_fun[id].at_cmdName);
         uart0_sendStr(temp);
@@ -149,19 +151,25 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
         os_sprintf(temp, "%s:APMAC,", at_fun[id].at_cmdName);
         uart0_sendStr(temp);
 
-        os_sprintf(temp, "\""MACSTR"\"\n",
-                   MAC2STR(bssid));
+        os_sprintf(temp, "\""MACSTR"\"\n%s\n",MAC2STR(bssid));
+        //os_sprintf(temp, "\""MACSTR"\"\n%s\n",bssid);
         uart0_sendStr(temp);
     #else
         //<SOH><CMD><P1><IP><P2><MAC><EOH>
         #ifdef DEBUG
             os_sprintf(log, "\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
             uart0_sendStr(log);
+            os_sprintf(log, "MAC:%s\n",MAC2STR(bssid));
+            uart0_sendStr(log);
         #endif // DEBUG
         os_sprintf(ip, "%d.%d.%d.%d",IP2STR(&pTempIp.ip));
-        os_sprintf(temp, "%c%c%s,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,ip,MAC2STR(bssid),CANWII_EOH);
+        os_sprintf(log, "%d:%d:%d:%d:%d:%d:%d",bssid[0],bssid[1],bssid[2],
+                       bssid[3],bssid[4],bssid[5]);
+
+        os_sprintf(temp, "%c%c%s,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,ip,log,CANWII_EOH);
         uart0_sendStr(temp);
     #endif // VERBOSE
+    */
 
   }
   if((at_wifiMode == STATION_MODE)||(at_wifiMode == STATIONAP_MODE))
@@ -171,6 +179,8 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
     #endif // DEBUG
     wifi_get_ip_info(0x00, &pTempIp);
     wifi_get_macaddr(STATION_IF, bssid);
+
+  }
 
     #ifdef VERBOSE
         os_sprintf(temp, "%s:STAIP,", at_fun[id].at_cmdName);
@@ -189,15 +199,19 @@ at_exeCmdCifsr(uint8_t id)//add get station ip and ap ip
         uart0_sendStr(temp);
     #else
         #ifdef DEBUG
-            os_sprintf(log, "\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
+            os_sprintf(log, "IP:\"%d.%d.%d.%d\"\n",IP2STR(&pTempIp.ip));
+            uart0_sendStr(log);
+            os_sprintf(log, "MAC:\"%d:%d:%d:%d:%d:%d\"\n",bssid[0],bssid[1],bssid[2],
+                       bssid[3],bssid[4],bssid[5]);
             uart0_sendStr(log);
         #endif // DEBUG
-        os_sprintf(temp, "%c%c%d%d.%d.%d.%s%c\n",CANWII_SOH, at_fun[id].at_cmdCode,
-                    1,IP2STR(&pTempIp.ip),2,MAC2STR(bssid),CANWII_EOH);
-        uart0_sendStr(temp);
+        os_sprintf(mac, "%d:%d:%d:%d:%d:%d",bssid[0],bssid[1],bssid[2],
+                       bssid[3],bssid[4],bssid[5]);
+
+        os_sprintf(ip, "%d.%d.%d.%d",IP2STR(&pTempIp.ip));
+        os_sprintf(temp, "%c%c%s,%s%c",CANWII_SOH, at_fun[id].at_cmdCode,ip,mac,CANWII_EOH);
     #endif // VERBOSE
 
-  }
   mdState = m_gotip;
   at_backOk;
 }
@@ -220,18 +234,22 @@ at_exeCmdCipstatus(uint8_t id)
     #else
         //os_sprintf(temp, "%c%c\n",CANWII_SOH, CMD_CIPSTATUS);
     #endif // VERBOSE
-  uart0_sendStr(temp);
+
+    #ifdef DEBUG
+       uart0_sendStr("getting status\n");
+    #endif // DEBUG
+//TODO
   if(serverEn)
   {
 
   }
+
   for(i=0; i<at_linkMax; i++)
   {
     if(pLink[i].linkEn)
     {
       if(pLink[i].pCon->type == ESPCONN_TCP)
       {
-
 
         #ifdef VERBOSE
         os_sprintf(temp, "%s:%d,\"TCP\",\"%d.%d.%d.%d\",%d,%d\n",
@@ -271,6 +289,12 @@ at_exeCmdCipstatus(uint8_t id)
                    pLink[i].pCon->proto.tcp->remote_port,
                    pLink[i].teType,CANWII_EOH);
             uart0_sendStr(temp);
+
+            #ifdef DEBUG
+                os_sprintf(temp,"link %d set\n",i);
+                uart0_sendStr(temp);
+            #endif // DEBUG
+
         #endif // VERBOSE
 
       }
@@ -282,7 +306,12 @@ at_exeCmdCipstatus(uint8_t id)
          //mdState);
         #else
             os_sprintf(temp, "%c%c%c",CANWII_SOH, CMD_CIPSTATUS,CANWII_EOH);
+            uart0_sendStr(temp);
         #endif // VERBOSE
+        #ifdef DEBUG
+            os_sprintf(temp,"link %d empty\n",i);
+            uart0_sendStr(temp);
+        #endif // DEBUG
     }
   }
   //uart_tx_one_char(CANWII_EOH);
@@ -1805,7 +1834,7 @@ at_setupCmdCipserver(uint8_t id, char *pPara)
     return;
   }
 
-    if (at_setupCmdCipserverEsp(serverEnTemp,port)!=0){
+    if (at_setupCmdCipserverEsp(serverEnTemp,port,server_timeover)!=0){
         at_backError;
         return;
     }
@@ -1813,7 +1842,7 @@ at_setupCmdCipserver(uint8_t id, char *pPara)
 }
 
 uint8_t ICACHE_FLASH_ATTR
-at_setupCmdCipserverEsp(uint8_t mode, int32_t port)
+at_setupCmdCipserverEsp(uint8_t mode, int32_t port,int16_t timeout)
 {
   int32_t tport;
 
@@ -1911,20 +1940,20 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port)
 
 
     pTcpServer->type = ESPCONN_TCP;
-    pTcpServer->state = ESPCONN_NONE;
+    pTcpServer->state = ESPCONN_LISTEN;
     pTcpServer->proto.tcp = (esp_tcp *)os_zalloc(sizeof(esp_tcp));
     pTcpServer->proto.tcp->local_port = tport;
     espconn_regist_connectcb(pTcpServer, at_tcpserver_listen);
     espconn_accept(pTcpServer);
-    espconn_regist_time(pTcpServer, server_timeover, 0);
+    espconn_regist_time(pTcpServer, timeout, 0);
   }
   else
   {
     /* restart */
     //TODO: change the message
-    generalMSG.msgid=MSG_RESTART;
-    generalMSG.param0=NULLPARAM;
-    sendGeneralMsg(generalMSG);
+    //generalMSG.msgid=MSG_RESTART;
+    //generalMSG.param0=NULLPARAM;
+    //sendGeneralMsg(generalMSG);
     #ifdef DEBUG
         char temp[50];
         os_sprintf(temp,"at_setupCmdCipserverEsp mode not expected:%d\n",mode);
@@ -2019,7 +2048,7 @@ at_setupCmdCipsto(uint8_t id, char *pPara)
   }
   pPara++;
   timeOver = atoi(pPara);
-  if(timeOver>28800)
+  if(timeOver>7200)
   {
     at_backError;
     return;

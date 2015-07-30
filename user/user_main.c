@@ -70,6 +70,7 @@ void user_init(void)
     #ifdef DEBUG
         uart0_sendStr("STARTING SAVED STATE\n");
     #endif // DEBUG
+    setupAp(&espParam);	
     setupServer(&espParam);
     espParam.state==1;
     espParam.saved==0;

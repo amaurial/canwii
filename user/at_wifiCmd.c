@@ -494,9 +494,9 @@ at_setupCmdCwsapEsp(struct softap_config *apConfig,uint8_t passwdlen)
         #endif // DEBUG
         return 1;
     }
-    //ETS_UART_INTR_DISABLE();
+    ETS_UART_INTR_DISABLE();
     ret=wifi_softap_set_config(apConfig);
-    //ETS_UART_INTR_ENABLE();
+    ETS_UART_INTR_ENABLE();
     return ((ret==true)?0:1);
 
 }

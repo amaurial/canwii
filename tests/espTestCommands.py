@@ -400,6 +400,12 @@ def setupMergServer():
     if checkReceived(resp)!=0:
         print ("Failed to set merg mode\n")
         return False
+    
+    #resp=sendCommand(CANWII_SOH + CMD_CIFSR + CANWII_EOH)
+    #if checkReceived(resp)!=0:
+    #    print ("Failed to get IP\n")
+    #    return False
+
     return True
 
 def connectToServer(host,port):

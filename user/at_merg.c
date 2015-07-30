@@ -12,7 +12,7 @@ at_setupMerg(uint8_t id,char *pPara )
   esp_StoreType esp;
 
   #ifdef DEBUG
-            uart0_sendStr("executing merg setip\n");
+        uart0_sendStr("executing merg setip\n");
   #endif // DEBUG
 
   pPara++;
@@ -88,11 +88,11 @@ setupAp(esp_StoreType *espdata ){
     os_bzero(&apConfig, sizeof(struct softap_config));
     wifi_softap_get_config(&apConfig);
 
-    if (espdata->ssidlen>16){
-        espdata->ssidlen=16;
+    if (espdata->ssidlen>sizeof(espdata->ssid)){
+        espdata->ssidlen=sizeof(espdata->ssid);
     }
-    if (espdata->passwdlen>16){
-        espdata->passwdlen=16;
+    if (espdata->passwdlen>sizeof(espdata->passwd)){
+        espdata->passwdlen=sizeof(espdata->passwd);
     }
     if (espdata->channel>11){
         espdata->channel=1;
@@ -103,11 +103,21 @@ setupAp(esp_StoreType *espdata ){
 
     if (espdata->ssidlen>0){
         os_memcpy(apConfig.ssid,&espdata->ssid,espdata->ssidlen);
+        #ifdef DEBUG
+            uart0_sendStr("SSID:");
+            uart0_sendStr(apConfig.ssid);
+            uart0_sendStr("\n");
+        #endif // DEBUG
     }else{
         apConfig.ssid[0]='\0';
     }
     if (espdata->passwdlen>0){
         os_memcpy(apConfig.password,&espdata->passwd,espdata->passwdlen);
+        #ifdef DEBUG
+            uart0_sendStr("PASSWORD:");
+            uart0_sendStr(apConfig.password);
+            uart0_sendStr("\n");
+        #endif // DEBUG
     }else{
         apConfig.password[0]='\0';
     }
@@ -159,7 +169,7 @@ setupServer(esp_StoreType *espdata ){
     #ifdef DEBUG
             uart0_sendStr("setting port\n");
         #endif // DEBUG
-    if (at_setupCmdCipserverEsp(espdata->server_mode,espdata->port)!=0){
+    if (at_setupCmdCipserverEsp(espdata->server_mode,espdata->port,espdata->timeout)!=0){
         #ifdef DEBUG
             uart0_sendStr("failed to set port\n");
         #endif // DEBUG

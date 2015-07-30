@@ -74,7 +74,7 @@ void at_setupCmdCipmux(uint8_t id, char *pPara);
 uint8_t at_setupCmdCipmuxEsp(uint8_t mux);
 
 void at_setupCmdCipserver(uint8_t id, char *pPara);
-uint8_t at_setupCmdCipserverEsp(uint8_t mode, int32_t port);
+uint8_t at_setupCmdCipserverEsp(uint8_t mode, int32_t port,int16_t timeout);
 
 void at_queryCmdCipmode(uint8_t id);
 void at_setupCmdCipmode(uint8_t id, char *pPara);
