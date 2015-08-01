@@ -128,6 +128,7 @@ setupAp(esp_StoreType *espdata ,bool save){
     apConfig.channel=espdata->channel;
     apConfig.authmode=espdata->wpa;
 
+    apConfig.ssid_len=espdata->ssidlen;
 
     if (at_setupCmdCwsapEsp(&apConfig,espdata->passwdlen)!=0){
         #ifdef DEBUG
@@ -192,7 +193,7 @@ setupServer(esp_StoreType *espdata ){
 void saveMergParams(esp_StoreType *espdata){
 
     esp_StoreType temp;
-    
+
     temp.baud=0;
     temp.channel=0;
     temp.cmdid=0;
@@ -213,7 +214,7 @@ void saveMergParams(esp_StoreType *espdata){
     temp.timeout=0;
     temp.wpa=0;
     user_esp_platform_save_param(&temp, sizeof(esp_StoreType));
-    
+
     #ifdef DEBUG
     char tempesp[255];
     os_sprintf(tempesp, "merg command: ssid-\"%s\" passwd-\"%s\" cmdid-%d cmdsubid-%d ssidlen-%d passwdlen-%d cwmode-%d cwmux-%d port-%d wpa-%d channel-%d dhcpmode-%d dhcpen-%d servermode-%d timeout-%d state-%d\n",
