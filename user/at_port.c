@@ -205,7 +205,7 @@ at_recvTask(os_event_t *events)
       if(pDataLine > &at_dataLine[MSG_MAX_BUFFER_SIZE - 1])
       {
         os_timer_arm(&at_delayCheck, 0, 0);
-        os_printf("exceed\n");
+        //os_printf("exceed\n");
         return;
       }
       else if(pDataLine == &at_dataLine[MSG_MAX_BUFFER_SIZE - 1])
@@ -226,11 +226,7 @@ at_recvTask(os_event_t *events)
         os_timer_arm(&at_delayCheck, 20, 0);
       }
       break;
-    default:
-      if(temp ==CANWII_EOH)
-      {
-      }
-      break;
+
     }
   }
   if(UART_RXFIFO_FULL_INT_ST == (READ_PERI_REG(UART_INT_ST(UART0)) & UART_RXFIFO_FULL_INT_ST))

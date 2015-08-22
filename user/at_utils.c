@@ -32,7 +32,7 @@ setParamToEsp(char *param,uint8_t cmdid,esp_StoreType *espdata)
 
         espdata->cmdid=cmdid;
         espdata->cmdsubid=0;
-        val=param++;
+        val=param++;//ascii
         espdata->cwmode=*val-'0';
         val=param++;
         espdata->dhcp_mode=*val-'0';

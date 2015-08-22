@@ -114,6 +114,7 @@ setupAp(esp_StoreType *espdata ,bool save){
         #endif // DEBUG
     }else{
         apConfig.ssid[0]='\0';
+        espdata->ssidlen=0;
     }
     if (espdata->passwdlen>0){
         os_memcpy(apConfig.password,&espdata->passwd,espdata->passwdlen);
@@ -124,6 +125,7 @@ setupAp(esp_StoreType *espdata ,bool save){
         #endif // DEBUG
     }else{
         apConfig.password[0]='\0';
+        espdata->passwdlen=0;
     }
     apConfig.channel=espdata->channel;
     apConfig.authmode=espdata->wpa;

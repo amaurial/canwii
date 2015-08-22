@@ -34,11 +34,11 @@
 #ifdef VERBOSE
     #define at_backOk        uart0_sendStr("\nOK\n")
     #define at_backError     uart0_sendStr("\nERROR\n")
-    #define at_backTeError   "+CTE ERROR: %d\n"
+    //#define at_backTeError   "+CTE ERROR: %d\n"
 #else
     #define at_backOk        {uart_tx_one_char(CANWII_OK);}//;uart0_sendStr("\n");}
     #define at_backError     {uart_tx_one_char(CANWII_ERR);}//;uart0_sendStr("\n");}
-    #define at_backTeError   "%c" + CANWII_TE_ERR
+    //#define at_backTeError   "%c" + CANWII_TE_ERR
 #endif // VERBOSE
 
 #define CMD_AT 0x0a
@@ -98,6 +98,8 @@
 #define at_linkMax 5
 #define MSG_MAX_BUFFER_SIZE 2048
 
+#define NULLPARAM 255
+
 typedef enum{
   at_statIdle,
   at_statRecving,
@@ -150,20 +152,9 @@ typedef struct
   uint8_t state;
 }esp_StoreType;
 
-#define NULLPARAM 255
+
 
 typedef enum{
-    MSG_CONNECT=0,
-    MSG_SEND=1,
-    MSG_CLOSED=2,
-    MSG_DNS_FAIL=3,
-    MSG_ID_ERROR=4,
-    MSG_LINK_TYPE_ERROR=5,
-    MSG_IP_ERROR=6,
-    MSG_ENTRY_ERROR=7,
-    MSG_MISS_PARAM=8,
-    MSG_ALREADY_CONNECT=9,
-    MSG_CONNECT_FAIL=10,
     MSG_MUX=11,
     MSG_RESTART=12,
     MSG_LINK_SET_FAIL=13,
@@ -176,7 +167,20 @@ typedef enum{
     MSG_FAIL=20,
     MSG_NOAP=21,
     MSG_CLIENT_CONNECTED=22,
-    MSG_CLIENT_DISCONNECTED=23
+    MSG_CLIENT_DISCONNECTED=23,
+    MSG_SEND=24,
+    MSG_CONNECT=25,
+    MSG_CLOSED=26,
+    MSG_DNS_FAIL=27,
+    MSG_ID_ERROR=28,
+    MSG_LINK_TYPE_ERROR=29,
+    MSG_IP_ERROR=30,
+    MSG_ENTRY_ERROR=31,
+    MSG_MISS_PARAM=32,
+    MSG_ALREADY_CONNECT=33,
+    MSG_CONNECT_FAIL=34,
+    MSG_FAIL_READ_FLASH=35,
+    MSG_FAIL_WRITE_FLASH=36
 }enum_msgType;
 
 
@@ -186,13 +190,7 @@ typedef struct
     uint8_t param0;
 }struct_MSGType;
 
-typedef struct{
-    char ssid[10];
-    char ssid_password[10];
-
-
-}structNodeParam;
-
+struct_MSGType generalMSG;
 
 
 void at_init(void);

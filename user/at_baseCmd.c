@@ -132,6 +132,10 @@ user_esp_platform_load_param(void *param, uint16 len)
                     uart0_sendStr("ERROR READING FAILED.\n");
                 }
             #endif // DEBUG
+
+            generalMSG.msgid=MSG_FAIL_READ_FLASH;
+            generalMSG.param0=0;
+            sendGeneralMsg(generalMSG);
         }
 }
 /*
@@ -225,6 +229,9 @@ user_esp_platform_save_param(void *param, uint16 len)
                 esptemp->timeout);
                 uart0_sendStr(temp);
             #endif // DEBUG
+            generalMSG.msgid=MSG_FAIL_WRITE_FLASH;
+            generalMSG.param0=0;
+            sendGeneralMsg(generalMSG);
         }
 }
 /*

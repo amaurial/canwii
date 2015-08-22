@@ -120,19 +120,6 @@ uart_tx_one_char(uint8 uart, uint8 TxChar)
 LOCAL void ICACHE_FLASH_ATTR
 uart1_write_char(char c)
 {
-/*
-  if (c == '\n')
-  {
-    //uart_tx_one_char(UART1, '\r');
-    uart_tx_one_char(UART1, '\n');
-  }
-  else if (c == '\r')
-  {
-  }
-  else
-  {
-    uart_tx_one_char(UART1, c);
-  }*/
   uart_tx_one_char(UART1, c);
 }
 /******************************************************************************
@@ -146,22 +133,10 @@ void ICACHE_FLASH_ATTR
 uart0_tx_buffer(uint8 *buf, uint16 len)
 {
   uint16 i;
-  uint8 c;
 
   for (i = 0; i < len; i++)
   {
-    //avoiding sending \r
-    c=buf[i];
-    /*
-    if (buf[i]=='\r') {
-        if (i<len){
-            if (buf[i+1]=='\n'){
-                c='\n';
-                i++;
-            }
-        }
-    }*/
-    uart_tx_one_char(UART0, c);
+    uart_tx_one_char(UART0, buf[i]);
   }
 }
 
@@ -203,7 +178,7 @@ uart0_rx_intr_handler(void *para)
 
   if(UART_FRM_ERR_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_FRM_ERR_INT_ST))
   {
-    os_printf("FRM_ERR\n");
+    //os_printf("FRM_ERR\n");
     WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_FRM_ERR_INT_CLR);
   }
 
@@ -246,6 +221,5 @@ uart_init(UartBautRate uart0_br, UartBautRate uart1_br)
 void ICACHE_FLASH_ATTR
 uart_reattach()
 {
-	//uart_init(BIT_RATE_74880, BIT_RATE_74880);
 	uart_init(BIT_RATE_115200, BIT_RATE_115200);
 }

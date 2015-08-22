@@ -656,7 +656,7 @@ at_setupCmdCipstamac(uint8_t id, char *pPara)
     pPara += 1;
   }
 
-  os_printf(MACSTR"\n", MAC2STR(bssid));
+  //os_printf(MACSTR"\n", MAC2STR(bssid));
   wifi_set_macaddr(STATION_IF, bssid);
 	at_backOk;
 }
@@ -707,7 +707,7 @@ at_setupCmdCipapmac(uint8_t id, char *pPara)
     pPara += 1;
   }
 
-  os_printf(MACSTR"\n", MAC2STR(bssid));
+  //os_printf(MACSTR"\n", MAC2STR(bssid));
   wifi_set_macaddr(SOFTAP_IF, bssid);
 	at_backOk;
 }
@@ -752,9 +752,9 @@ at_setupCmdCipsta(uint8_t id, char *pPara)
   wifi_get_ip_info(0x00, &pTempIp);
   pTempIp.ip.addr = ipaddr_addr(temp);
 
-  os_printf("%c.%c.%d.%d\n",
+  /*os_printf("%c.%c.%d.%d\n",
                  IP2STR(&pTempIp.ip));
-
+  */
   if(!wifi_set_ip_info(0x00, &pTempIp))
   {
     at_backError;
@@ -803,9 +803,9 @@ at_setupCmdCipap(uint8_t id, char *pPara)
   wifi_get_ip_info(0x01, &pTempIp);
   pTempIp.ip.addr = ipaddr_addr(temp);
 
-  os_printf("%c.%c.%c.%c\n",
+  /*os_printf("%c.%c.%c.%c\n",
                  IP2STR(&pTempIp.ip));
-
+  */
   if(!wifi_set_ip_info(0x01, &pTempIp))
   {
     at_backError;

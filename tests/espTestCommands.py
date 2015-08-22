@@ -395,7 +395,7 @@ def setupMergServer():
 #                <PORT>
 #        <EOH>
 #        */
-    resp=sendCommand(CANWII_SOH + CMD_MERG_AP + "=" + "merg,123,100" + CANWII_EOH,2)
+    resp=sendCommand(CANWII_SOH + CMD_MERG_AP + "=" + "merg,123,500" + CANWII_EOH,2)
 
     if checkReceived(resp)!=0:
         print ("Failed to set merg mode\n")

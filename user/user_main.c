@@ -78,9 +78,9 @@ void user_init(void)
         uart0_sendStr("STARTING SAVED STATE\n");
     #endif // DEBUG
     setupAp(&espParam,false);
-    os_delay_us(20000);
+    os_delay_us(10000);
     setupServer(&espParam);
-
+    os_delay_us(10000);
     //print the ip
 //    #ifdef DEBUG
 //            uart0_sendStr("printing ip and status\n");
@@ -95,7 +95,6 @@ void user_init(void)
 
   //TODO Change message
     #ifdef DEBUG
-        os_printf("ready!!!\n");
         uart0_sendStr("ready\n");
     #endif //DEBUG
 
