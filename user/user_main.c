@@ -23,6 +23,9 @@
 
 extern uint8_t at_wifiMode;
 extern void user_esp_platform_load_param(void *param, uint16 len);
+void user_rf_pre_init(){};
+
+
 
 void printEspParam(esp_StoreType *espP){
 
