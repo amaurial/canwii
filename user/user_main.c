@@ -57,6 +57,7 @@ void printEspParam(esp_StoreType *espP){
 void user_init(void)
 {
   //global parameters
+  uart_div_modify(0,UART_CLK_FREQ / 115200);
   esp_StoreType espParam;
 
   uart_init(BIT_RATE_115200, BIT_RATE_115200);

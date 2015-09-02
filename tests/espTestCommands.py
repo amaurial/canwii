@@ -34,6 +34,9 @@ if options.port == None:
 
 #    3. x, x is bigger than 0, float allowed, timeout block call
 
+#stringcoding="windows-1252"
+stringcoding="ascii"
+
 CMD_AT = "\x0a"
 CMD_RST = "\x0b"
 CMD_GMR = "\x0c"
@@ -88,8 +91,8 @@ def sendCommand(command,timewait=0):
             #write data
             if options.binary:
                 print("write data binary:" , command, end='\n')
-            print("write data ascii:" , command.encode('ascii'), end='\n')
-            ser.write(command.encode('ascii'))
+            print("write data ascii:" , command.encode(stringcoding), end='\n')
+            ser.write(command.encode(stringcoding))
             #ser.flush()
             time.sleep(timewait)  #give the serial port sometime to receive the data
             numOfLines = 0
@@ -103,19 +106,19 @@ def sendCommand(command,timewait=0):
                     numOfLines = numOfLines + 1
                     if len(cmdResponse)>0:
                         #print("read2");
-                        if checkReceived(cmdResponse.decode('ascii'))>=0:
+                        if checkReceived(cmdResponse.decode(stringcoding))>=0:
                             #print("read3");
-                            return cmdResponse.decode('ascii')
+                            return cmdResponse.decode(stringcoding)
                             break
                     if ((numOfLines >= 30) and (len(response) == 0)):
-                        return cmdResponse.decode('ascii')
+                        return cmdResponse.decode(stringcoding)
                         break
                     #response = ser.readline()
                     #print("read4");
                     response=ser.read(255)
                     cmdResponse = cmdResponse + response
                     if len(response)>0:
-                        print("read data ascii: " , cmdResponse.decode('ascii'),end='\n')
+                        print("read data ascii: " , cmdResponse.decode(stringcoding),end='\n')
                         if options.binary:
                             print("read data binary: " , cmdResponse,end='\n')
                 else:
@@ -135,7 +138,7 @@ def resetEsp():
             #write data
             print("write data:" , "RESET", end='\n')
             command=CANWII_SOH + CMD_RST + CANWII_EOH
-            ser.write(command.encode('ascii'))
+            ser.write(command.encode(stringcoding))
             time.sleep(5)  #give the serial port sometime to receive the data
 
 
@@ -448,10 +451,10 @@ def readServerData():
                 response = ser.readline()
                 bindata=response
                 if len(response)>0:
-                    print("data ascii: " + response.decode("ascii"),end='\n')
+                    print("data ascii: " + response.decode("windows-1252"),end='\n')
                     if options.binary:
                         print("data binary: " + bindata,end='\n')
-                    if (response.decode().find("quit")>=0):
+                    if (response.decode(stringcoding).find("quit")>=0):
                         return True
         except Exception as e:
                 print("error open serial port: " + e)
@@ -495,7 +498,7 @@ if ser.isOpen():
                 if ser.isOpen():
                     response=ser.read(255)
                     if len(response) >0 :
-                        print("read data ascii: " , response.decode('ascii'),end='\n')
+                        print("read data ascii: " , response.decode(stringcoding,'ignore'),end='\n')
                         if options.binary:
                             print("read data binary: " , response,end='\n')
                 else:
@@ -507,16 +510,16 @@ if ser.isOpen():
                 if ser.isOpen():
                     response=ser.read(255)
                     if len(response) >0 :
-                        print("read data ascii: " , response.decode('ascii'),end='\n')
+                        print("read data ascii: " , response.decode(stringcoding),end='\n')
                         if options.binary:
                             print("read data binary: " , response,end='\n')
 
                         pkconn= CANWII_SOH + CANWII_ERR + "220" + CANWII_EOH
                         #print("pkconn: " , pkconn,end='\n')
-                        if pkconn in response.decode('ascii') :
+                        if pkconn in response.decode(stringcoding) :
                             print("client connected. sending version")
                             resp=sendCommand(CANWII_SOH + CMD_CIPSEND +"=0" + "VN2.0\n*5\n" + CANWII_EOH)
-                        if "NEngine" in response.decode('ascii'):
+                        if "NEngine" in response.decode(stringcoding):
                             resp=sendCommand(CANWII_SOH + CMD_CIPSEND +"=0" + "*5\n*+\n" + CANWII_EOH)
 
                 else:
