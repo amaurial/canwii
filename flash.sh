@@ -20,8 +20,12 @@ ESPSDK=esp_sdk_0x40000.bin
 BLANK=blank.bin
 
 if [ "$WHICH" == "both" ];then
+
+   echo "Cleaning the flash"
+   esptool.py --port $PORT -b 115200 write_flash 0x00000 $BLANK 0x01000 $BLANK 0x40000 $BLANK 0x7c000 $BLANK 0x7e000 $BLANK 0x3D000 $BLANK  
+   
    echo "Flashing SDK and APP" 
-   esptool.py --port $PORT -b 115200 write_flash 0x3D000 $BLANK 0x40000 $ESPSDK 0x00000 $ATAPP
+   esptool.py --port $PORT -b 115200 write_flash 0x40000 $ESPSDK 0x00000 $ATAPP
    exit 0
 fi
 
