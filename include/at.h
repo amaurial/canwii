@@ -95,7 +95,7 @@
 #define TCP_SERVER_TIMEOUT 600//0 to 7200 seconds
 
 
-#define at_linkMax 5
+#define at_linkMax 10
 #define MSG_MAX_BUFFER_SIZE 2048
 
 #define NULLPARAM 255
@@ -180,7 +180,8 @@ typedef enum{
     MSG_ALREADY_CONNECT=33,
     MSG_CONNECT_FAIL=34,
     MSG_FAIL_READ_FLASH=35,
-    MSG_FAIL_WRITE_FLASH=36
+    MSG_FAIL_WRITE_FLASH=36,
+    MSG_FAIL_TCP_MAX_CONN=37
 }enum_msgType;
 
 

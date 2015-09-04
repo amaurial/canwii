@@ -317,6 +317,9 @@ sendGeneralMsg(struct_MSGType msgtype)
         case MSG_NOAP:
             os_sprintf(temp,"NO AP\n");
             break;
+        case MSG_FAIL_TCP_MAX_CONN:
+            os_sprintf(temp,"Failed to set max tcp connections:%d\n",at_linkMax);
+            break;
         }
     #else
         //char temp[5];

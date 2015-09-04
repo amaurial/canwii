@@ -1884,6 +1884,17 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port,int16_t timeout)
     pTcpServer->state = ESPCONN_LISTEN;
     pTcpServer->proto.tcp = (esp_tcp *)os_zalloc(sizeof(esp_tcp));
     pTcpServer->proto.tcp->local_port = tport;
+    //number of tcp connections
+    if (espconn_tcp_set_max_con_allow(pTcpServer,at_linkMax) != 0){
+        #ifdef DEBUG
+            char temp[50];
+            os_sprintf(temp,"Failed to set max tcp connections:%d\n",at_linkMax);
+            uart0_sendStr(temp);
+        #endif // DEBUG
+        generalMSG.msgid=MSG_FAIL_TCP_MAX_CONN;
+        generalMSG.param0=at_linkMax;
+        sendGeneralMsg(generalMSG);
+    }
     espconn_regist_connectcb(pTcpServer, at_tcpserver_listen);
     espconn_accept(pTcpServer);
     espconn_regist_time(pTcpServer, timeout, 0);

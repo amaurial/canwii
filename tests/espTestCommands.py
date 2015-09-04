@@ -36,8 +36,8 @@ if options.port == None:
 
 #    3. x, x is bigger than 0, float allowed, timeout block call
 
-stringcoding="windows-1252"
-#stringcoding="ascii"
+#stringcoding="windows-1252"
+stringcoding="ascii"
 
 CMD_AT = "\x0a"
 CMD_RST = "\x0b"
