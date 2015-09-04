@@ -1,4 +1,4 @@
-# !/usr/bin/python3
+#!/usr/bin/python3
 from optparse import OptionParser
 import serial, time
 
@@ -8,6 +8,8 @@ parser.add_option("-p", "--port", dest="port", default="/dev/ttyUSB0",
                   help="Serial port", metavar="PORT")
 parser.add_option("-b", "--binary", action="store_true", dest="binary", default=False,
                   help="Print strings in binary", metavar="BINARY")
+parser.add_option("-t", "--test", action="store_true", dest="test", default=False,
+                  help="Do some tests", metavar="TEST")
 parser.add_option("-l", "--listen", action="store_true", dest="listen", default=False,
                   help="Just listen the port", metavar="LISTEN")
 parser.add_option("-s", "--server", action="store_true", dest="server", default=False,
@@ -34,8 +36,8 @@ if options.port == None:
 
 #    3. x, x is bigger than 0, float allowed, timeout block call
 
-#stringcoding="windows-1252"
-stringcoding="ascii"
+stringcoding="windows-1252"
+#stringcoding="ascii"
 
 CMD_AT = "\x0a"
 CMD_RST = "\x0b"
@@ -106,19 +108,19 @@ def sendCommand(command,timewait=0):
                     numOfLines = numOfLines + 1
                     if len(cmdResponse)>0:
                         #print("read2");
-                        if checkReceived(cmdResponse.decode(stringcoding))>=0:
+                        if checkReceived(cmdResponse.decode(stringcoding,'ignore'))>=0:
                             #print("read3");
-                            return cmdResponse.decode(stringcoding)
+                            return cmdResponse.decode(stringcoding,'ignore')
                             break
                     if ((numOfLines >= 30) and (len(response) == 0)):
-                        return cmdResponse.decode(stringcoding)
+                        return cmdResponse.decode(stringcoding,'ignore')
                         break
                     #response = ser.readline()
                     #print("read4");
                     response=ser.read(255)
                     cmdResponse = cmdResponse + response
                     if len(response)>0:
-                        print("read data ascii: " , cmdResponse.decode(stringcoding),end='\n')
+                        print("read data ascii: " , cmdResponse.decode(stringcoding,'ignore'),end='\n')
                         if options.binary:
                             print("read data binary: " , cmdResponse,end='\n')
                 else:
@@ -451,10 +453,10 @@ def readServerData():
                 response = ser.readline()
                 bindata=response
                 if len(response)>0:
-                    print("data ascii: " + response.decode("windows-1252"),end='\n')
+                    print("data ascii: " + response.decode(stringcoding,'ignore'),end='\n')
                     if options.binary:
                         print("data binary: " + bindata,end='\n')
-                    if (response.decode(stringcoding).find("quit")>=0):
+                    if (response.decode(stringcoding,'ignore').find("quit")>=0):
                         return True
         except Exception as e:
                 print("error open serial port: " + e)
@@ -475,6 +477,77 @@ def testComands():
     for k,v in CMDS.items():
         print("Testing ",k,end='\n')
         sendCommand(CANWII_SOH + v + CANWII_TEST+ CANWII_EOH)
+
+def testDHCP():
+
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "=0,0" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set dhcp station mode\n")
+        return False
+
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "?" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to check dhcp mode\n")
+        return False
+
+
+    time.sleep(2);
+    print("DHCP STATION MODE DISABLE",end='\n')
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "=0,1" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to unset dhcp station mode\n")
+        return False
+
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "?" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to check dhcp mode\n")
+        return False
+
+
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "=1,0" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set dhcp station mode\n")
+        return False
+
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "?" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to check dhcp mode\n")
+        return False
+
+
+    time.sleep(2);
+
+    print("DHCP STATION MODE DISABLE",end='\n')
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "=1,1" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to unset dhcp softap mode\n")
+        return False
+
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "?" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to check dhcp mode\n")
+        return False
+
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "=2,0" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to set both mode\n")
+        return False
+
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "?" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to check dhcp mode\n")
+        return False
+
+    time.sleep(2);
+    print("DHCP STATION MODE DISABLE",end='\n')
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "=2,1" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to unset dhcp both\n")
+        return False
+    resp=sendCommand(CANWII_SOH + CMD_CWDHCP + "?" + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to check dhcp mode\n")
+        return False
 
 ser = serial.Serial()
 ser.port = options.port
@@ -510,21 +583,23 @@ if ser.isOpen():
                 if ser.isOpen():
                     response=ser.read(255)
                     if len(response) >0 :
-                        print("read data ascii: " , response.decode(stringcoding),end='\n')
+                        print("read data ascii: " , response.decode(stringcoding,'ignore'),end='\n')
                         if options.binary:
                             print("read data binary: " , response,end='\n')
 
                         pkconn= CANWII_SOH + CANWII_ERR + "220" + CANWII_EOH
                         #print("pkconn: " , pkconn,end='\n')
-                        if pkconn in response.decode(stringcoding) :
+                        if pkconn in response.decode(stringcoding,'ignore') :
                             print("client connected. sending version")
                             resp=sendCommand(CANWII_SOH + CMD_CIPSEND +"=0" + "VN2.0\n*5\n" + CANWII_EOH)
-                        if "NEngine" in response.decode(stringcoding):
+                        if "NEngine" in response.decode(stringcoding,'ignore'):
                             resp=sendCommand(CANWII_SOH + CMD_CIPSEND +"=0" + "*5\n*+\n" + CANWII_EOH)
 
                 else:
                     print ("Reopening Serial Port.")
                     reopenSerial()
+        if options.test:
+            testDHCP();
         else:
 
             print ("Sending AT")

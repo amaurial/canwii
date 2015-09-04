@@ -57,7 +57,7 @@ void printEspParam(esp_StoreType *espP){
 void user_init(void)
 {
   //global parameters
-  uart_div_modify(0,UART_CLK_FREQ / 115200);
+  //uart_div_modify(0,UART_CLK_FREQ / 115200);
   esp_StoreType espParam;
 
   uart_init(BIT_RATE_115200, BIT_RATE_115200);
@@ -77,7 +77,7 @@ void user_init(void)
   //printEspParam(&espParam);
 
   //create the server
-  if (espParam.state==1){
+  if (espParam.state == 1){
     #ifdef DEBUG
         uart0_sendStr("STARTING SAVED STATE\n");
     #endif // DEBUG
