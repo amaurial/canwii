@@ -1702,7 +1702,7 @@ at_tcpserver_listen(void *arg)
       break;
     }
   }
-  if(i>=5)
+  if(i>=at_linkMax)
   {
     #ifdef DEBUG
         uart0_sendStr("at_tcpserver_listen linkid > 5\n");
