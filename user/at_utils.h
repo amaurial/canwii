@@ -10,7 +10,7 @@
 uint8_t at_dataStrCpyWithDelim(void *pDest, const void *pSrc, int8_t maxLen,char delim);
 int8_t at_dataStrCpy(void *pDest, const void *pSrc, int8_t maxLen);
 bool setParamToEsp(char *param,uint8_t cmdid,esp_StoreType *espdata);
-struct_MSGType generalMSG;
+//struct_MSGType generalMSG;
 void sendGeneralMsg(struct_MSGType msgtype);
 void logMessage(char *msg);
 

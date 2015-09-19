@@ -94,7 +94,7 @@
 
 #define TCP_SERVER_TIMEOUT 600//0 to 7200 seconds
 
-
+//number of connections
 #define at_linkMax 10
 #define MSG_MAX_BUFFER_SIZE 2048
 
