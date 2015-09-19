@@ -26,17 +26,13 @@
 #include "user_interface.h"
 #include "osapi.h"
 
-#define at_cmdNum   27
+#define at_cmdNum   22
 
 at_funcationType at_fun[at_cmdNum]={
   {NULL,    0,      0x00,               NULL,               NULL, NULL,           at_exeCmdNull},
   {"+RST",  4,      CMD_RST,            at_testCmdGeneric,  NULL, NULL,           at_exeCmdRst},
   {"+GMR",  4,      CMD_GMR,            at_testCmdGeneric,  NULL, NULL,           at_exeCmdGmr},
-  {"+GSLP", 5,      CMD_GSLP,           at_testCmdGeneric,  NULL, at_setupCmdGslp, NULL},
   {"+CWMODE",   7,  CMD_CWMODE,         at_testCmdGeneric,  at_queryCmdCwmode,  at_setupCmdCwmode,      NULL},
-  {"+CWJAP",    6,  CMD_CWJAP,          at_testCmdGeneric,  at_queryCmdCwjap,   at_setupCmdCwjap,       NULL},
-  {"+CWLAP",    6,  CMD_CWLAP,          at_testCmdGeneric,  NULL,               at_setupCmdCwlap,       at_exeCmdCwlap},
-  {"+CWQAP",    6,  CMD_CWQAP,          at_testCmdGeneric,  NULL,               NULL,                   at_exeCmdCwqap},
   {"+CWSAP",    6,  CMD_CWSAP,          at_testCmdGeneric,  at_queryCmdCwsap,   at_setupCmdCwsap,       NULL},
   {"+CWLIF",    6,  CMD_CWLIF,          at_testCmdGeneric,  NULL,               NULL,                   at_exeCmdCwlif},
   {"+CWDHCP",   7,  CMD_CWDHCP,         at_testCmdGeneric,  at_queryCmdCwdhcp,  at_setupCmdCwdhcp,      NULL},
@@ -46,7 +42,6 @@ at_funcationType at_fun[at_cmdNum]={
   {"+CIPSTA",   7,  CMD_CIPSTA,         at_testCmdGeneric,  at_queryCmdCipsta,  at_setupCmdCipsta,      NULL},
   {"+CIPAP",    6,  CMD_CIPAP,          at_testCmdGeneric,  at_queryCmdCipap,   at_setupCmdCipap,       NULL},
   {"+CIPSTATUS",10, CMD_CIPSTATUS,      at_testCmdGeneric,  NULL,               NULL,                   at_exeCmdCipstatus},
-  {"+CIPSTART", 9,  CMD_CIPSTART,       at_testCmdCipstart, NULL,               at_setupCmdCipstart,    NULL},
   {"+CIPCLOSE", 9,  CMD_CIPCLOSE,       at_testCmdGeneric,  NULL,               at_setupCmdCipclose,    at_exeCmdCipclose},
   {"+CIPSEND",  8,  CMD_CIPSEND,        at_testCmdGeneric,  NULL,               at_setupCmdCipsend,     at_exeCmdCipsend},
   {"+CIPMUX",   7,  CMD_CIPMUX,         at_testCmdGeneric,  at_queryCmdCipmux,  at_setupCmdCipmux,      NULL},

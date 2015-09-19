@@ -23,7 +23,7 @@
 
 extern uint8_t at_wifiMode;
 extern void user_esp_platform_load_param(void *param, uint16 len);
-void user_rf_pre_init(){};
+void user_rf_pre_init(){};//required by SDK 1.2
 
 
 
@@ -57,14 +57,16 @@ void printEspParam(esp_StoreType *espP){
 void user_init(void)
 {
   //global parameters
-  //uart_div_modify(0,UART_CLK_FREQ / 115200);
   esp_StoreType espParam;
 
   uart_init(BIT_RATE_115200, BIT_RATE_115200);
+
   #ifdef DEBUG
     uart0_sendStr("INIT\n");
   #endif // DEBUG
+  //load saed parameters
   user_esp_platform_load_param(&espParam, sizeof(esp_StoreType));
+  //get actual wifi mode
   at_wifiMode = wifi_get_opmode();
 
   #ifdef DEBUG

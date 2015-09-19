@@ -96,7 +96,6 @@ at_recvTask(os_event_t *events)
       //}
     }
 
-
     switch(at_state)
     {
     case at_statIdle: //search SOH head
@@ -142,7 +141,7 @@ at_recvTask(os_event_t *events)
         //start to process the received command
         //the other task at_procTask start to process the buffer
         at_state = at_statProcess;
-        //TODO:
+
         //confirm command received?
         if(echoFlag)
         {
@@ -164,7 +163,6 @@ at_recvTask(os_event_t *events)
       {
         #ifdef VERBOSE
             uart0_sendStr("\nbusy p...\n");
-
         #else
             uart_tx_one_char(CANWII_ERR_BUSY);
         #endif // VERBOSE
@@ -197,15 +195,14 @@ at_recvTask(os_event_t *events)
         #endif // VERBOSE
       }
       break;
-    //TODO:
-    //what is that?
+
     case at_statIpTraning:
       os_timer_disarm(&at_delayCheck);
 
       if(pDataLine > &at_dataLine[MSG_MAX_BUFFER_SIZE - 1])
       {
         os_timer_arm(&at_delayCheck, 0, 0);
-        //os_printf("exceed\n");
+
         return;
       }
       else if(pDataLine == &at_dataLine[MSG_MAX_BUFFER_SIZE - 1])
