@@ -1,4 +1,4 @@
-/* 
+/*
  * File	: at_cmd.h
  * This file is part of Espressif's AT+ command set program.
  * Copyright (C) 2013 - 2016, Espressif Systems
@@ -26,7 +26,7 @@
 #include "user_interface.h"
 #include "osapi.h"
 
-#define at_cmdNum   22
+#define at_cmdNum   23
 
 at_funcationType at_fun[at_cmdNum]={
   {NULL,    0,      0x00,               NULL,               NULL, NULL,           at_exeCmdNull},
@@ -50,7 +50,8 @@ at_funcationType at_fun[at_cmdNum]={
   {"+CIPSTO",   7,  CMD_CIPSTO,         at_testCmdGeneric,  at_queryCmdCipsto,  at_setupCmdCipsto,      NULL},
   {"+MERG"    , 5,  CMD_MERG_CONFIG_AP_EXT,at_testCmdGeneric,  NULL,               at_setupMerg,           NULL},
   {"+MERGAP"  , 7,  CMD_MERG_CONFIG_AP, at_testCmdGeneric,  NULL,               at_setupMerg,           NULL},
-  {"+AT",       3,  CMD_AT,             at_testCmdGeneric,  at_exeCmdNull,      NULL,                   at_exeCmdNull}
-};
+  {"+AT",       3,  CMD_AT,             at_testCmdGeneric,  at_exeCmdNull,      NULL,                   at_exeCmdNull},
+  {"+VERSION",  8,  CMD_MERG_VERSION,   at_testCmdGeneric,  NULL,       NULL,           merg_version}
+  };
 
 #endif

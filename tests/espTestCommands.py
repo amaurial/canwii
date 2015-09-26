@@ -71,6 +71,7 @@ CMD_ATE = "\x26"
 CMD_MPINFO = "\x27"
 CMD_MERG = "\x29"
 CMD_MERG_AP= "\x2a"
+CMD_VERSION= "\x2b"
 
 CANWII_SOH = "\x01"
 CANWII_EOH = "\x04"
@@ -108,6 +109,10 @@ def sendCommand(command,timewait=0):
                     numOfLines = numOfLines + 1
                     if len(cmdResponse)>0:
                         #print("read2");
+                        print("read data ascii: " , cmdResponse.decode(stringcoding,'ignore'),end='\n')
+                        if options.binary:
+                            print("read data binary: " , cmdResponse,end='\n')
+                        
                         if checkReceived(cmdResponse.decode(stringcoding,'ignore'))>=0:
                             #print("read3");
                             return cmdResponse.decode(stringcoding,'ignore')
@@ -608,6 +613,11 @@ if ser.isOpen():
             if checkReceived(resp)!=0:
                 print ("No OK found\n")
 
+            print ("Sending Version")
+            resp=sendCommand(CANWII_SOH + CMD_VERSION + CANWII_EOH)
+            print ("VERSION received")
+            if checkReceived(resp)!=0:
+                print ("No OK found\n")
            # resp=sendCommand(CANWII_SOH + CMD_CWLAP + CANWII_EOH)
            # if checkReceived(resp)!=0:
            #     print ("No OK found\n")

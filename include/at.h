@@ -70,6 +70,7 @@
 #define CMD_IPD 0x28
 #define CMD_MERG_CONFIG_AP_EXT 0x29
 #define CMD_MERG_CONFIG_AP 0x2a
+#define CMD_MERG_VERSION 0x2b
 
 #define CMD_QUERY '?'
 #define CMD_EQUAL '='
@@ -95,7 +96,7 @@
 #define TCP_SERVER_TIMEOUT 600//0 to 7200 seconds
 
 //number of connections
-#define at_linkMax 10
+#define at_linkMax 5
 #define MSG_MAX_BUFFER_SIZE 2048
 
 #define NULLPARAM 255

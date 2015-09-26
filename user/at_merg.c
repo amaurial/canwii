@@ -209,6 +209,24 @@ setupServer(esp_StoreType *espdata ){
 
 }
 
+void ICACHE_FLASH_ATTR
+merg_version(uint8_t id){
+    char temp[15];
+    uint8_t majVersion=0;
+    uint8_t minVersion=1;
+    uint8_t sdkMajVersion=1;
+    uint8_t sdkMinVersion=2;
+    os_sprintf(temp,"%c%c%d%d%d%d%c",CANWII_SOH,
+             CMD_MERG_VERSION,
+             majVersion,
+             minVersion,
+             sdkMajVersion,
+             sdkMinVersion,
+             CANWII_EOH);
+   uart0_sendStr(temp);
+   at_backOk;
+}
+
 void saveMergParams(esp_StoreType *espdata){
 
     esp_StoreType temp;
