@@ -36,7 +36,7 @@ TARGET_LDFLAGS =		\
 	-nostdlib		\
 	-Wl,-EL \
 	--longcalls \
-	--text-section-literals
+	--text-section-literals 
 
 ifeq ($(FLAVOR),debug)
     TARGET_LDFLAGS += -g -O2

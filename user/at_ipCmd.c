@@ -1623,6 +1623,7 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port,int16_t timeout)
     pTcpServer->proto.tcp = (esp_tcp *)os_zalloc(sizeof(esp_tcp));
     pTcpServer->proto.tcp->local_port = tport;
     //number of tcp connections
+    /*
     if (espconn_tcp_set_max_con_allow(pTcpServer,at_linkMax) != 0){
         #ifdef DEBUG
             char temp[50];
@@ -1633,6 +1634,7 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port,int16_t timeout)
         generalMSG.param0=at_linkMax;
         sendGeneralMsg(generalMSG);
     }
+    */
     espconn_regist_connectcb(pTcpServer, at_tcpserver_listen);
     espconn_accept(pTcpServer);
     espconn_regist_time(pTcpServer, timeout, 0);
@@ -1650,6 +1652,9 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port,int16_t timeout)
         uart0_sendStr(temp);
     #endif // DEBUG
     //uart0_sendStr("we must restart\n");
+    generalMSG.msgid=MSG_INVALID_MODE;
+    generalMSG.param0=mode;
+    sendGeneralMsg(generalMSG);
     return 1;
   }
   serverEn = mode;

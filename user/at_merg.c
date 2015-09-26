@@ -20,6 +20,10 @@ at_setupMerg(uint8_t id,char *pPara )
   #ifdef DEBUG
             uart0_sendStr("failed to parse the command\n");
   #endif // DEBUG
+    generalMSG.msgid=MSG_PARSE_FAIL;
+    generalMSG.param0=NULLPARAM;
+    sendGeneralMsg(generalMSG);
+
     at_backError;
     return;
   }
@@ -68,6 +72,9 @@ setupAp(esp_StoreType *espdata ,bool save){
         #ifdef DEBUG
                 uart0_sendStr("failed to set mode\n");
         #endif // DEBUG
+        generalMSG.msgid=MSG_FAIL_SET_MODE;
+        generalMSG.param0=espdata->cwmode;
+        sendGeneralMsg(generalMSG);
         at_backError;
         return;
     }
@@ -80,6 +87,9 @@ setupAp(esp_StoreType *espdata ,bool save){
         #ifdef DEBUG
             uart0_sendStr("failed to set dhcp\n");
         #endif // DEBUG
+        generalMSG.msgid=MSG_FAIL_DHCP;
+        generalMSG.param0=NULLPARAM;
+        sendGeneralMsg(generalMSG);
         at_backError;
         return;
     }
@@ -131,11 +141,15 @@ setupAp(esp_StoreType *espdata ,bool save){
     apConfig.authmode=espdata->wpa;
 
     apConfig.ssid_len=espdata->ssidlen;
+    apConfig.max_connection=at_linkMax;
 
     if (at_setupCmdCwsapEsp(&apConfig,espdata->passwdlen)!=0){
         #ifdef DEBUG
             uart0_sendStr("failed to set ssi\n");
         #endif // DEBUG
+        generalMSG.msgid=MSG_FAIL_SET_AP;
+        generalMSG.param0=NULLPARAM;
+        sendGeneralMsg(generalMSG);
         at_backError;
         return;
     }
@@ -173,6 +187,9 @@ setupServer(esp_StoreType *espdata ){
         #ifdef DEBUG
             uart0_sendStr("failed to set server mode\n");
         #endif // DEBUG
+        generalMSG.msgid=MSG_FAIL_SET_MULT_CON;
+        generalMSG.param0=NULLPARAM;
+        sendGeneralMsg(generalMSG);
         at_backError;
         return;
     }

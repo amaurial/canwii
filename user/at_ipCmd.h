@@ -62,7 +62,7 @@ void getShowIP_MAC(uint8_t p_ip_param,uint8_t p_mac_param,bool msg,uint8_t id);
 void at_exeCmdCipstatus(uint8_t id);
 
 void at_testCmdCipstart(uint8_t id);
-void at_setupCmdCipstart(uint8_t id, char *pPara);
+//void at_setupCmdCipstart(uint8_t id, char *pPara);
 
 void at_setupCmdCipclose(uint8_t id, char *pPara);
 void at_exeCmdCipclose(uint8_t id);
