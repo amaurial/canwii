@@ -290,4 +290,99 @@ void saveMergParams(esp_StoreType *espdata){
         }
     #endif // DEBUG
 }
+void ICACHE_FLASH_ATTR
+at_merg_status(uint8_t id){
+    uint8_t st;
+    st = server_info.which_clients;
+    if (server_info.server_mode){
+        st &= 0xff;
+    }
+    else st=0;
+
+    #ifdef DEBUG
+            uart0_sendStr("getting status\n");
+    #endif // DEBUG
+
+    char temp[5];
+    os_sprintf(temp,"%c%c%c%c%",CANWII_SOH,
+             CMD_MERG_STATUS,
+             st,
+             CANWII_EOH);
+   uart0_sendStr(temp);
+   at_backOk;
+}
+
+void ICACHE_FLASH_ATTR
+at_merg_query_setup(uint8_t id){
+
+    #ifdef DEBUG
+            uart0_sendStr("getting setup info\n");
+    #endif // DEBUG
+    esp_StoreType temp;
+    temp.baud=0;
+    temp.channel=0;
+    temp.cmdid=0;
+    temp.cmdsubid=0;
+    temp.cwmode=0;
+    temp.cwmux=0;
+    temp.dhcp_enable=0;
+    temp.dhcp_mode=0;
+    os_memset(temp.passwd,'\0',sizeof(temp.passwd));
+    os_memset(temp.ssid,'\0',sizeof(temp.ssid));
+    temp.passwdlen=16;
+    temp.port=0;
+    temp.saved=0;
+    temp.server_mode=0;
+    temp.ssidlen=16;
+    temp.state=0;
+    temp.tcp_udp_mode=0;
+    temp.timeout=0;
+    temp.wpa=0;
+    user_esp_platform_load_param(&temp, sizeof(esp_StoreType));
+
+    char tempesp[255];
+
+    #ifdef DEBUG
+    os_sprintf(tempesp, "merg command: ssid-\"%s\" passwd-\"%s\" cmdid-%d cmdsubid-%d ssidlen-%d passwdlen-%d cwmode-%d cwmux-%d port-%d wpa-%d channel-%d dhcpmode-%d dhcpen-%d servermode-%d timeout-%d state-%d\n",
+        temp.ssid,
+        temp.passwd,
+        temp.cmdid,
+        temp.cmdsubid,
+        temp.ssidlen,
+        temp.passwdlen,
+        temp.cwmode,
+        temp.cwmux,
+        temp.port,
+        temp.wpa,
+        temp.channel,
+        temp.dhcp_mode,
+        temp.dhcp_enable,
+        temp.server_mode,
+        temp.timeout,
+        temp.state);
+    uart0_sendStr(tempesp);
+    #endif // DEBUG
+
+    os_memset(tempesp,'\0',sizeof(tempesp));
+
+    os_sprintf(tempesp, "%c%c%s,%s,%d,%d%d%c%d%d%d%d%d%d%d%c",
+        CANWII_SOH,
+        CMD_MERG_CONFIG_AP,
+        temp.ssid,
+        temp.passwd,
+        temp.timeout,
+        temp.cmdid,
+        temp.cmdsubid,
+        temp.cwmode,
+        temp.cwmux,
+        temp.port,
+        temp.wpa,
+        temp.channel,
+        temp.dhcp_mode,
+        temp.dhcp_enable,
+        temp.server_mode,
+        CANWII_EOH);
+   uart0_sendStr(tempesp);
+   at_backOk;
+}
 

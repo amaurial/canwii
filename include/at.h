@@ -71,6 +71,7 @@
 #define CMD_MERG_CONFIG_AP_EXT 0x29
 #define CMD_MERG_CONFIG_AP 0x2a
 #define CMD_MERG_VERSION 0x2b
+#define CMD_MERG_STATUS 0x2c
 
 #define CMD_QUERY '?'
 #define CMD_EQUAL '='
@@ -200,6 +201,15 @@ typedef struct
 }struct_MSGType;
 
 struct_MSGType generalMSG;
+
+typedef struct{
+    bool server_mode;
+    uint8_t which_clients; //1 bit for each client. bit 0 =channel 0
+
+}struct_server_info;
+
+static at_linkNum = 0;
+struct_server_info server_info;
 
 
 void at_init(void);

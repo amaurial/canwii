@@ -26,7 +26,7 @@
 #include "user_interface.h"
 #include "osapi.h"
 
-#define at_cmdNum   23
+#define at_cmdNum   24
 
 at_funcationType at_fun[at_cmdNum]={
   {NULL,    0,      0x00,               NULL,               NULL, NULL,           at_exeCmdNull},
@@ -48,10 +48,11 @@ at_funcationType at_fun[at_cmdNum]={
   {"+CIPSERVER",10, CMD_CIPSERVER,      at_testCmdGeneric,  NULL,               at_setupCmdCipserver,   NULL},
   {"+CIPMODE",  8,  CMD_CIPMODE,        at_testCmdGeneric,  at_queryCmdCipmode, at_setupCmdCipmode,     NULL},
   {"+CIPSTO",   7,  CMD_CIPSTO,         at_testCmdGeneric,  at_queryCmdCipsto,  at_setupCmdCipsto,      NULL},
-  {"+MERG"    , 5,  CMD_MERG_CONFIG_AP_EXT,at_testCmdGeneric,  NULL,               at_setupMerg,           NULL},
+  {"+MERG"    , 5,  CMD_MERG_CONFIG_AP_EXT,at_testCmdGeneric,  at_merg_query_setup,               at_setupMerg,           NULL},
   {"+MERGAP"  , 7,  CMD_MERG_CONFIG_AP, at_testCmdGeneric,  NULL,               at_setupMerg,           NULL},
   {"+AT",       3,  CMD_AT,             at_testCmdGeneric,  at_exeCmdNull,      NULL,                   at_exeCmdNull},
-  {"+VERSION",  8,  CMD_MERG_VERSION,   at_testCmdGeneric,  NULL,       NULL,           merg_version}
+  {"+VERSION",  8,  CMD_MERG_VERSION,   at_testCmdGeneric,  NULL,       NULL,           merg_version},
+  {"+STATUS",  7,   CMD_MERG_STATUS,    at_testCmdGeneric,  NULL,       NULL,           at_merg_status}
   };
 
 #endif

@@ -40,7 +40,7 @@ static BOOL disAllFlag = FALSE;
 static at_linkConType pLink[at_linkMax];
 static uint8_t sendingID;
 static BOOL serverEn = FALSE;
-static at_linkNum = 0;
+
 
 
 static uint16_t server_timeover = TCP_SERVER_TIMEOUT;
@@ -1357,6 +1357,10 @@ at_tcpserver_discon_cb(void *arg)
         linkTemp->teToff = FALSE;
         at_backOk;
     }
+
+    //unset the ith bit
+    server_info.which_clients &=  ~(0x01 << linkTemp->linkId);
+
     at_linkNum--;
     if (at_linkNum == 0)
     {
@@ -1460,6 +1464,9 @@ at_tcpserver_listen(void *arg)
   mdState = m_linked;
   at_linkNum++;
   pespconn->reverse = &pLink[i];
+  //set the ith bit
+  server_info.which_clients |= (0x1 << i);
+
   espconn_regist_recvcb(pespconn, at_tcpclient_recv);
   espconn_regist_reconcb(pespconn, at_tcpserver_recon_cb);
   espconn_regist_disconcb(pespconn, at_tcpserver_discon_cb);

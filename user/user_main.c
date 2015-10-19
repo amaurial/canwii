@@ -79,6 +79,8 @@ void user_init(void)
   //printEspParam(&espParam);
 
   //create the server
+  server_info.server_mode=false;
+  server_info.which_clients=0;
   if (espParam.state == 1){
     #ifdef DEBUG
         uart0_sendStr("STARTING SAVED STATE\n");
@@ -87,6 +89,7 @@ void user_init(void)
     os_delay_us(10000);
     setupServer(&espParam);
     os_delay_us(10000);
+    server_info.server_mode=true;
     //print the ip
 //    #ifdef DEBUG
 //            uart0_sendStr("printing ip and status\n");

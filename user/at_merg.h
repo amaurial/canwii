@@ -11,6 +11,8 @@
 #include <stdlib.h>
 
 void at_setupMerg(uint8_t id,char *pPara );
+void at_merg_query_setup(uint8_t id);
+void at_merg_status(uint8_t id);
 void setupServer(esp_StoreType *espdata );
 void setupAp(esp_StoreType *espdata,bool save);
 void saveMergParams(esp_StoreType *espdata);
