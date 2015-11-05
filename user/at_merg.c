@@ -213,7 +213,7 @@ void ICACHE_FLASH_ATTR
 merg_version(uint8_t id){
     char temp[15];
     uint8_t majVersion=0;
-    uint8_t minVersion=1;
+    uint8_t minVersion=2;
     uint8_t sdkMajVersion=1;
     uint8_t sdkMinVersion=2;
     os_sprintf(temp,"%c%c%d%d%d%d%c",CANWII_SOH,
@@ -365,14 +365,12 @@ at_merg_query_setup(uint8_t id){
 
     os_memset(tempesp,'\0',sizeof(tempesp));
 
-    os_sprintf(tempesp, "%c%c%s,%s,%d,%d%d%c%d%d%d%d%d%d%d%c",
+    os_sprintf(tempesp, "%c%c%s,%s,%d,%d%d%c%d%d%d%d%d%c",
         CANWII_SOH,
         CMD_MERG_CONFIG_AP,
         temp.ssid,
         temp.passwd,
         temp.timeout,
-        temp.cmdid,
-        temp.cmdsubid,
         temp.cwmode,
         temp.cwmux,
         temp.port,

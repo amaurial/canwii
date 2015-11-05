@@ -180,9 +180,39 @@ Parameters:2
 Return version followed by
 OK = CANWII_OK or ERROR=CANWII_ERR
 
-5.4.6
+5.4.6 Get server status
 
-5.4.7
+Code: 0x2c CMD_MERG_STATUS
+Format: <SOM><CMD_MERG_STATUS><EOM>
+Response:
+<SOM><CMD_MERG_STATUS><ST><EOM>
+ST = Bit7 ..... Bit0
+Bit7=1 indicates the server is set
+Bit0 to Bit4 indicates if the linkid is being used. So Bit0 = 1 means the linkid 1 is occupied.
+
+If the server is off the ST will be 0.
+
+5.4.7 Get setup parameters
+
+Code: 0x2a CMD_MERG_CONFIG_AP
+Format: <SOM><CMD_MERG_CONFIG_AP><?><EOM>
+
+Response:
+<SOM><CMD_MERG_CONFIG_AP><PARAM0> ... <PARAM10><EOM>
+Parameters are:
+PARAM0 = ssid,
+PARAM1 = password,
+PARAM2 = timeout,
+PARAM3 = cwmode
+PARAM4 = cwmux
+PARAM5 = port
+PARAM6 = wpa
+PARAM7 = channel
+PARAM8 = dhcp_mode
+PARAM9 = dhcp_enable
+PARAM10 = server_mode
+
+All parameters are ascii except the PARAM5 = port which is hexa.
 
 5.4.8
 
@@ -191,39 +221,38 @@ OK = CANWII_OK or ERROR=CANWII_ERR
 
 7. Constants
 
-CMD_ATE         0x0a
-CMD_RST         0x0b
-CMD_GMR         0x0c
-CMD_GSLP        0x0d
-CMD_IPR         0x0e
-CMD_CWMODE      0x0f
-CMD_CWJAP       0x10
-CMD_CWLAP       0x11
-CMD_CWQAP       0x12
-CMD_CWSAP       0x13
-CMD_CWLIF       0x14
-CMD_CWDHCP      0x15
-CMD_CIFSR       0x16
-CMD_CIPSTAMAC   0x17
-CMD_CIPAPMAC    0x18
-CMD_CIPSTA      0x19
-CMD_CIPAP       0x1a
-CMD_CIPSTATUS   0x1b
-CMD_CIPSTART    0x1c
-CMD_CIPCLOSE    0x1d
-CMD_CIPSEND     0x1e
-CMD_CIPMUX      0x1f
-CMD_CIPSERVER   0x20
-CMD_CIPMODE     0x21
-CMD_CIPSTO      0x22
-CMD_CIUPDATE    0x23
-CMD_CIPING      0x24
-CMD_CIPAPPUP    0x25
-CMD_ATE         0x26
-CMD_MPINFO      0x27
-CMD_IPD         0x28
-CMD_MERG_AP_EX  0x29
-CMD_MERG_AP     0x30
+CMD_AT 0x0a
+CMD_RST 0x0b
+CMD_GMR 0x0c
+CMD_GSLP 0x0d
+CMD_CWMODE 0x0f
+CMD_CWJAP 0x10
+CMD_CWLAP 0x11
+CMD_CWQAP 0x12
+CMD_CWSAP 0x13
+CMD_CWLIF 0x14
+CMD_CWDHCP 0x15
+CMD_CIFSR 0x16
+CMD_CIPSTAMAC 0x17
+CMD_CIPAPMAC 0x18
+CMD_CIPSTA 0x19
+CMD_CIPAP 0x1a
+CMD_CIPSTATUS 0x1b
+CMD_CIPSTART 0x1c
+CMD_CIPCLOSE 0x1d
+CMD_CIPSEND 0x1e
+CMD_CIPMUX 0x1f
+CMD_CIPSERVER 0x20
+CMD_CIPMODE 0x21
+CMD_CIPSTO 0x22
+CMD_CIUPDATE 0x23
+CMD_MPINFO 0x27
+CMD_IPD 0x28
+CMD_MERG_CONFIG_AP_EXT 0x29
+CMD_MERG_CONFIG_AP 0x2a
+CMD_MERG_VERSION 0x2b
+CMD_MERG_STATUS 0x2c
+
 
 Actions
 
