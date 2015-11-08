@@ -492,9 +492,9 @@ at_tcpclient_sent_cb(void *arg)
   specialAtState = TRUE;
   at_state = at_statIdle;
 
-  generalMSG.msgid=MSG_SEND;
-  generalMSG.param0=linkTemp->linkId;
-  sendGeneralMsg(generalMSG);
+  //generalMSG.msgid=MSG_SEND;
+  //generalMSG.param0=linkTemp->linkId;
+  //sendGeneralMsg(generalMSG);
 
   at_backOk;
 
