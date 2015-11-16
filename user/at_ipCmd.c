@@ -907,7 +907,7 @@ at_setupCmdCipclose(uint8_t id, char *pPara)
 
       generalMSG.msgid=MSG_LINK_SET_FAIL;
       generalMSG.param0=pLink[linkID].linkId;
-      sendGeneralMsg(generalMSG);
+      //sendGeneralMsg(generalMSG);
 
       return;
     }
