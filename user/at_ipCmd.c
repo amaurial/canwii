@@ -362,6 +362,7 @@ void ICACHE_FLASH_ATTR
 at_tcpclient_recv(void *arg, char *pdata, unsigned short len)
 {
   struct espconn *pespconn = (struct espconn *)arg;
+  system_os_post(at_procTaskPrio, 0, 0);
   at_linkConType *linkTemp = (at_linkConType *)pespconn->reverse;
   at_sendData(pdata,len,linkTemp->linkId);
 }
@@ -1400,8 +1401,6 @@ at_tcpserver_recon_cb(void *arg, sint8 errType)
   {
     mdState = m_unlink;
   }
-
-
     generalMSG.msgid=MSG_CONNECT;
     generalMSG.param0=linkTemp->linkId;
     sendGeneralMsg(generalMSG);
@@ -1645,6 +1644,7 @@ at_setupCmdCipserverEsp(uint8_t mode, int32_t port,int16_t timeout)
     espconn_regist_connectcb(pTcpServer, at_tcpserver_listen);
     espconn_accept(pTcpServer);
     espconn_regist_time(pTcpServer, timeout, 0);
+    espconn_set_opt(pTcpServer,3);
   }
   else
   {

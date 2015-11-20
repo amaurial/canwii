@@ -100,6 +100,15 @@ void user_init(void)
 
 
   }
+
+  system_set_os_print(0);//system print off
+  if (system_update_cpu_freq(SYS_CPU_160MHZ)){
+    #ifdef DEBUG
+        uart0_sendStr("CPU on 160Mhz\n");
+    #endif // DEBUG
+  }
+  wifi_set_sleep_type(NONE_SLEEP_T);
+  uart0_sendStr("merg");
   at_backOk;
 
   //TODO Change message

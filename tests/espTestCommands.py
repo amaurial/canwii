@@ -112,7 +112,7 @@ def sendCommand(command,timewait=0):
                         print("read data ascii: " , cmdResponse.decode(stringcoding,'ignore'),end='\n')
                         if options.binary:
                             print("read data binary: " , cmdResponse,end='\n')
-                        
+
                         if checkReceived(cmdResponse.decode(stringcoding,'ignore'))>=0:
                             #print("read3");
                             return cmdResponse.decode(stringcoding,'ignore')
@@ -405,12 +405,21 @@ def setupMergServer():
 #                <PORT>
 #        <EOH>
 #        */
-    resp=sendCommand(CANWII_SOH + CMD_MERG_AP + "=" + "merg,123,500" + CANWII_EOH,2)
+    resp=sendCommand(CANWII_SOH + CMD_MERG_AP + "=" + "merg,123,700" + CANWII_EOH,2)
 
     if checkReceived(resp)!=0:
         print ("Failed to set merg mode\n")
         return False
-    
+
+    resp=sendCommand(CANWII_SOH + CMD_CIFSR + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed to get ip\n")
+
+    print ("Printing STATUS\n")
+    resp=sendCommand(CANWII_SOH + CMD_CIPSTATUS + CANWII_EOH)
+    if checkReceived(resp)!=0:
+        print ("Failed get status\n")
+        return False
     #resp=sendCommand(CANWII_SOH + CMD_CIFSR + CANWII_EOH)
     #if checkReceived(resp)!=0:
     #    print ("Failed to get IP\n")
@@ -631,6 +640,7 @@ if ser.isOpen():
             #   readServerData()
             #if setupApServer():
             if setupMergServer():
+
                 #ser.close()
                 #time.sleep(5);
                 #reopenSerial()
